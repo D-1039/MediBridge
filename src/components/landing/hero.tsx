@@ -40,7 +40,7 @@ export function Hero() {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link href="/dashboard">Explore Dashboard</Link>
+                <Link href="/login?portal=pharmacist">Pharmacist Login</Link>
               </Button>
             </div>
             <div className="flex items-center gap-8 mt-12">

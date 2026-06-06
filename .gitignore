@@ -30,6 +30,16 @@ yarn-error.log*
 
 # env files
 .env*.local
+.env
+backend/.env
+
+# backend
+backend/node_modules/
+backend/coverage/
+backend/service-account*.json
+backend/google-vision-api-key.txt
+backend/vision-api-key.txt
+backend/uploads/
 
 # vercel
 .vercel

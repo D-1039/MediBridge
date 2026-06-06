@@ -1,0 +1,55 @@
+# Supplemental OpenAPI path documentation
+
+/api/medicines/upload:
+  post:
+    tags: [Medicines]
+    summary: Upload medicine strip image (donor)
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [image]
+            properties:
+              image:
+                type: string
+                format: binary
+              medicine_name:
+                type: string
+              quantity:
+                type: integer
+              expiry_date:
+                type: string
+                format: date
+    responses:
+      "201":
+        description: Uploaded, stored in Firebase, OCR triggered
+        content:
+          application/json:
+            example:
+              success: true
+              message: Medicine uploaded and OCR processed
+              data:
+                medicine:
+                  id: "uuid"
+                  status: pending_pharmacist
+                  image_url: "https://storage.googleapis.com/..."
+                ocr:
+                  confidence: 0.87
+
+/api/pharmacist/pending:
+  get:
+    tags: [Pharmacist]
+    summary: List medicines awaiting pharmacist review
+    security:
+      - bearerAuth: []
+
+/api/analytics/dashboard:
+  get:
+    tags: [Analytics]
+    summary: Platform analytics for dashboards
+    security:
+      - bearerAuth: []

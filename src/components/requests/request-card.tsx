@@ -1,10 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Users, Clock, Pill } from "lucide-react";
+import { MapPin, Users, Clock, Pill, Check, X, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { ApiError } from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDate } from "@/utils/format";
+import {
+  SmartMatchCard,
+  type SmartMatch,
+} from "@/components/requests/smart-match-card";
 
 interface MedicineRequest {
   id: string;
@@ -15,9 +23,35 @@ interface MedicineRequest {
   status: "pending" | "approved";
   location: string;
   date: string;
+  smart_match?: SmartMatch | null;
 }
 
-export function RequestCard({ request }: { request: MedicineRequest }) {
+export function RequestCard({
+  request,
+  showActions,
+  onApprove,
+  onReject,
+}: {
+  request: MedicineRequest;
+  showActions?: boolean;
+  onApprove?: (id: string) => Promise<void>;
+  onReject?: (id: string) => Promise<void>;
+}) {
+  const [busy, setBusy] = useState(false);
+
+  const run = async (fn?: (id: string) => Promise<void>) => {
+    if (!fn) return;
+    setBusy(true);
+    try {
+      await fn(request.id);
+      toast.success("Request updated");
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Update failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -61,6 +95,34 @@ export function RequestCard({ request }: { request: MedicineRequest }) {
               {formatDate(request.date)}
             </div>
           </div>
+
+          {request.smart_match && request.status === "pending" && (
+            <SmartMatchCard match={request.smart_match} />
+          )}
+
+          {showActions && (
+            <div className="flex gap-2 mt-4 pt-4 border-t">
+              <Button
+                size="sm"
+                className="flex-1"
+                disabled={busy}
+                onClick={() => run(onApprove)}
+              >
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                Approve
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                className="flex-1"
+                disabled={busy}
+                onClick={() => run(onReject)}
+              >
+                <X className="h-4 w-4" />
+                Reject
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </motion.div>

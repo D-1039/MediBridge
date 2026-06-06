@@ -16,7 +16,10 @@ import {
 import { chartData, wasteData } from "@/services/mock-data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export function DonationsChart() {
+type ChartPoint = { month: string; donations: number; distributed: number };
+type WastePoint = { name: string; value: number; fill: string };
+
+export function DonationsChart({ data = chartData }: { data?: ChartPoint[] }) {
   return (
     <Card className="glass-card border-0 shadow-lg">
       <CardHeader>
@@ -24,7 +27,7 @@ export function DonationsChart() {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={280}>
-          <AreaChart data={chartData}>
+          <AreaChart data={data}>
             <defs>
               <linearGradient id="colorDonations" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.3} />
@@ -68,7 +71,9 @@ export function DonationsChart() {
   );
 }
 
-export function WasteReductionChart() {
+export function WasteReductionChart({ data = wasteData }: { data?: WastePoint[] }) {
+  const reduced = data.find((d) => d.name === "Reduced")?.value ?? 0;
+
   return (
     <Card className="glass-card border-0 shadow-lg">
       <CardHeader>
@@ -78,7 +83,7 @@ export function WasteReductionChart() {
         <ResponsiveContainer width="100%" height={280}>
           <PieChart>
             <Pie
-              data={wasteData}
+              data={data}
               cx="50%"
               cy="50%"
               innerRadius={70}
@@ -86,7 +91,7 @@ export function WasteReductionChart() {
               paddingAngle={4}
               dataKey="value"
             >
-              {wasteData.map((entry, index) => (
+              {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
             </Pie>
@@ -95,7 +100,7 @@ export function WasteReductionChart() {
           </PieChart>
         </ResponsiveContainer>
         <div className="text-center -mt-4">
-          <p className="text-3xl font-bold gradient-text">45%</p>
+          <p className="text-3xl font-bold gradient-text">{reduced}%</p>
           <p className="text-sm text-muted-foreground">Waste Reduced</p>
         </div>
       </CardContent>

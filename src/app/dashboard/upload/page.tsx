@@ -6,7 +6,7 @@ export default function UploadPage() {
     <div>
       <DashboardHeader
         title="Upload Medicine"
-        subtitle="Donate unused medicines for safe redistribution"
+        subtitle="Upload image → enter details manually → optional OCR suggestions → pharmacist review"
       />
       <MedicineUploadForm />
     </div>

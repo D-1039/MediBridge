@@ -1,9 +1,12 @@
 "use client";
 
-import { Bell, Search } from "lucide-react";
+import Link from "next/link";
+import { Bell, LogOut, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { UserAccountMenu } from "@/components/dashboard/user-account-menu";
+import { useAuth } from "@/contexts/auth-provider";
 
 interface DashboardHeaderProps {
   title: string;
@@ -11,6 +14,8 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
+  const { user, logout } = useAuth();
+
   return (
     <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
@@ -19,7 +24,17 @@ export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
           <p className="text-muted-foreground mt-1">{subtitle}</p>
         )}
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap justify-end">
+        {user?.role === "donor" && (
+          <Button asChild variant="outline" size="sm" className="text-xs">
+            <Link href="/login?portal=pharmacist">Pharmacist login?</Link>
+          </Button>
+        )}
+        {user?.role && (
+          <span className="text-xs font-medium px-2 py-1 rounded-md bg-muted capitalize hidden sm:inline">
+            {user.role}
+          </span>
+        )}
         <div className="relative hidden sm:block">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Search..." className="pl-9 w-64" />
@@ -29,9 +44,17 @@ export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
           <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
         </Button>
         <ThemeToggle />
-        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center text-white font-semibold text-sm">
-          AD
-        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="sm:hidden text-red-600 border-red-200 hover:bg-red-500/10 dark:border-red-900/50"
+          onClick={() => void logout()}
+        >
+          <LogOut className="h-4 w-4" />
+          Logout
+        </Button>
+        <UserAccountMenu />
       </div>
     </header>
   );

@@ -44,8 +44,11 @@ export function Navbar() {
         </nav>
         <div className="hidden md:flex items-center gap-3">
           <ThemeToggle />
+          <Button asChild variant="outline" size="sm">
+            <Link href="/login?portal=pharmacist">Pharmacist Login</Link>
+          </Button>
           <Button asChild size="sm">
-            <Link href="/login">Get Started</Link>
+            <Link href="/login">Donor Login</Link>
           </Button>
         </div>
         <div className="flex md:hidden items-center gap-2">
@@ -78,8 +81,15 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              <Button asChild variant="outline">
+                <Link href="/login?portal=pharmacist" onClick={() => setMobileOpen(false)}>
+                  Pharmacist Login
+                </Link>
+              </Button>
               <Button asChild>
-                <Link href="/login">Get Started</Link>
+                <Link href="/login" onClick={() => setMobileOpen(false)}>
+                  Donor / Login
+                </Link>
               </Button>
             </nav>
           </motion.div>

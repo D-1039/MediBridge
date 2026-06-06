@@ -21,7 +21,15 @@ export function Footer() {
               <li><Link href="/features" className="hover:text-foreground transition-colors">Features</Link></li>
               <li><Link href="/about" className="hover:text-foreground transition-colors">About</Link></li>
               <li><Link href="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link></li>
-              <li><Link href="/login" className="hover:text-foreground transition-colors">Login</Link></li>
+              <li><Link href="/login" className="hover:text-foreground transition-colors">Donor Login</Link></li>
+              <li>
+                <Link
+                  href="/login?portal=pharmacist"
+                  className="hover:text-foreground transition-colors font-medium text-teal-600 dark:text-teal-400"
+                >
+                  Pharmacist Login (Approve / Reject)
+                </Link>
+              </li>
               <li><Link href="/dashboard/upload" className="hover:text-foreground transition-colors">Donate</Link></li>
             </ul>
           </div>

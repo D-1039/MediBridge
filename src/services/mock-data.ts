@@ -197,11 +197,12 @@ export const navLinks = [
 
 export const sidebarLinks = [
   { href: "/dashboard", label: "Dashboard", icon: "LayoutDashboard" },
+  { href: "/dashboard/admin", label: "Admin Panel", icon: "Settings2" },
   { href: "/dashboard/upload", label: "Upload Medicine", icon: "Upload" },
   { href: "/dashboard/requests", label: "Requests", icon: "ClipboardList" },
   {
     href: "/dashboard/verification",
-    label: "Verification",
+    label: "Approve / Reject",
     icon: "ShieldCheck",
   },
 ];
