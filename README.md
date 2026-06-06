@@ -15,6 +15,7 @@ A modern healthcare hackathon MVP for reducing medicine wastage and redistributi
 ## Getting Started
 
 ```bash
+cd frontend
 npm install
 npm run dev
 ```
@@ -46,12 +47,16 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Project Structure
 
 ```
-src/
-├── app/              # Next.js App Router pages
-├── components/       # UI, landing, dashboard, upload, etc.
-├── hooks/            # useCounter, useInView
-├── services/         # Mock data
-└── utils/            # Format helpers
+frontend/
+├── src/
+│   ├── app/              # Next.js App Router pages
+│   ├── components/       # UI, landing, dashboard, upload, etc.
+│   ├── hooks/            # useCounter, useInView
+│   ├── services/         # Mock data
+│   └── utils/            # Format helpers
+├── package.json
+├── tsconfig.json
+└── next.config.ts
 ```
 
 ## Full stack (frontend + API)
@@ -77,6 +82,7 @@ API: http://localhost:5000/api
 ### 2. Frontend
 
 ```bash
+cd frontend
 cp .env.local.example .env.local   # or use the included .env.local
 npm install
 npm run dev

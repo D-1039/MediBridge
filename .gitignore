@@ -13,10 +13,13 @@
 
 # next.js
 /.next/
+/frontend/.next/
 /out/
+/frontend/out/
 
 # production
 /build
+/frontend/build
 
 # misc
 .DS_Store
@@ -47,3 +50,4 @@ backend/uploads/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+frontend/next-env.d.ts
