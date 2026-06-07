@@ -11,6 +11,8 @@ A modern healthcare hackathon MVP for reducing medicine wastage and redistributi
 - **Framer Motion**
 - **Recharts**
 - **Lucide React**
+- teseract for ocr
+- 
 
 ## Getting Started
 
