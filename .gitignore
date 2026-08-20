@@ -16,6 +16,7 @@
 /frontend/.next/
 /out/
 /frontend/out/
+/frontend/node_modules/
 
 # production
 /build
@@ -23,6 +24,7 @@
 
 # misc
 .DS_Store
+Thumbs.db
 *.pem
 
 # debug
@@ -35,6 +37,7 @@ yarn-error.log*
 .env*.local
 .env
 backend/.env
+frontend/.env
 
 # backend
 backend/node_modules/
@@ -43,9 +46,12 @@ backend/service-account*.json
 backend/google-vision-api-key.txt
 backend/vision-api-key.txt
 backend/uploads/
+backend/.pg-data/
+backend/.pg-data-test/
 
 # vercel
 .vercel
+/frontend/.vercel
 
 # typescript
 *.tsbuildinfo

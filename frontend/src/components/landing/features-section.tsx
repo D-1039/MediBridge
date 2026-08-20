@@ -46,7 +46,7 @@ const features = [
 export function FeaturesSection() {
   return (
     <section id="features" className="section-padding relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-sky-500/5 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-600/5 to-transparent" />
       <div className="container mx-auto relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -70,10 +70,10 @@ export function FeaturesSection() {
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
               whileHover={{ scale: 1.03 }}
-              className="glass-card p-6 group hover:border-sky-500/30 transition-all"
+              className="glass-card p-6 group hover:border-blue-600/30 transition-all"
             >
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-sky-500/20 to-teal-500/20 flex items-center justify-center mb-4 group-hover:from-sky-500 group-hover:to-teal-500 transition-all">
-                <feature.icon className="h-6 w-6 text-sky-600 group-hover:text-white transition-colors" />
+              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-600/20 to-green-600/20 flex items-center justify-center mb-4 group-hover:from-blue-600 group-hover:to-green-600 transition-all">
+                <feature.icon className="h-6 w-6 text-blue-600 group-hover:text-white transition-colors" />
               </div>
               <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">

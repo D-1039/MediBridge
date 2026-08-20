@@ -31,8 +31,8 @@ export function VisionSetupBanner() {
 
   if (freeMode) {
     return (
-      <div className="mb-6 rounded-xl border border-teal-500/40 bg-teal-500/10 p-4">
-        <p className="text-sm font-medium text-teal-800 dark:text-teal-200">
+      <div className="mb-6 rounded-xl border border-green-600/40 bg-green-600/10 p-4">
+        <p className="text-sm font-medium text-green-800 dark:text-green-200">
           Free local OCR (no Google billing)
         </p>
         <p className="text-xs text-muted-foreground mt-1">

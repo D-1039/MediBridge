@@ -18,7 +18,7 @@ export function StatsSection() {
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="rounded-3xl bg-gradient-to-r from-sky-500 via-teal-500 to-emerald-500 p-1"
+          className="rounded-3xl bg-gradient-to-r from-blue-600 to-green-600 p-1"
         >
           <div className="rounded-[22px] bg-background/95 backdrop-blur p-8 md:p-12">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">

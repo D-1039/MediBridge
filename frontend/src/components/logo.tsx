@@ -10,7 +10,7 @@ interface LogoProps {
 export function Logo({ className, showText = true }: LogoProps) {
   return (
     <Link href="/" className={cn("flex items-center gap-2 group", className)}>
-      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-teal-500 shadow-lg shadow-sky-500/25 group-hover:scale-105 transition-transform">
+      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-green-600 shadow-lg shadow-blue-600/20 group-hover:scale-105 transition-transform">
         <HeartPulse className="h-5 w-5 text-white" />
       </div>
       {showText && (

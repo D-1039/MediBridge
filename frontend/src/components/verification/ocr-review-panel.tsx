@@ -24,10 +24,10 @@ export function OcrReviewPanel({
   ];
 
   return (
-    <div className="rounded-xl border border-sky-500/25 bg-sky-500/5 overflow-hidden">
-      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-sky-500/20 bg-sky-500/10">
+    <div className="rounded-xl border border-blue-600/25 bg-blue-600/5 overflow-hidden">
+      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-blue-600/20 bg-blue-600/10">
         <div className="flex items-center gap-2">
-          <ScanLine className="h-4 w-4 text-sky-500" />
+          <ScanLine className="h-4 w-4 text-blue-600" />
           <span className="text-sm font-semibold">OCR Review Panel</span>
         </div>
         <span className="text-xs text-muted-foreground">Reference only</span>

@@ -34,7 +34,7 @@ export function WorkflowSection() {
         </motion.div>
 
         <div className="relative">
-          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-sky-500 via-teal-500 to-emerald-500 -translate-y-1/2" />
+          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 to-green-600 -translate-y-1/2" />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
             {steps.map((step, i) => (
               <motion.div
@@ -45,9 +45,9 @@ export function WorkflowSection() {
                 transition={{ delay: i * 0.1 }}
                 className="relative flex flex-col items-center text-center"
               >
-                <div className="relative z-10 h-16 w-16 rounded-2xl bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center shadow-lg shadow-sky-500/25 mb-4">
+                <div className="relative z-10 h-16 w-16 rounded-2xl bg-gradient-to-br from-blue-600 to-green-600 flex items-center justify-center shadow-lg shadow-blue-600/20 mb-4">
                   <step.icon className="h-8 w-8 text-white" />
-                  <span className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-white dark:bg-slate-900 text-xs font-bold flex items-center justify-center border-2 border-sky-500">
+                  <span className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-white dark:bg-slate-900 text-xs font-bold flex items-center justify-center border-2 border-blue-600">
                     {i + 1}
                   </span>
                 </div>

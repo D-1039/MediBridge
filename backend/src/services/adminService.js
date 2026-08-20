@@ -55,12 +55,14 @@ const adminService = {
 
   async getAnalytics() {
     const overview = await this.getOverview();
+    const requestAnalytics = await requestRepository.getRequestAnalytics();
     return {
       ...overview,
       monthly_donation_growth: await medicineRepository.getMonthlyDonations(6),
       most_donated: await medicineRepository.getTopDonatedMedicines(6),
       most_requested: await requestRepository.getTopRequestedMedicines(6),
       expiry_trend: await medicineRepository.getExpiryTrend(6),
+      request_analytics: requestAnalytics,
     };
   },
 

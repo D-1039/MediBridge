@@ -33,7 +33,7 @@ export function StatCard({
           <p className="text-sm text-muted-foreground font-medium">{title}</p>
           <p className="text-3xl font-bold mt-2">{value}</p>
           {change && (
-            <p className="text-xs text-emerald-600 mt-1 font-medium">{change}</p>
+            <p className="text-xs text-green-600 mt-1 font-medium">{change}</p>
           )}
         </div>
         <div

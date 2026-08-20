@@ -115,7 +115,7 @@ function LoginForm() {
         <ThemeToggle />
       </div>
 
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-sky-500 via-teal-500 to-emerald-500 p-12 flex-col justify-between overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-blue-600 to-green-600 p-12 flex-col justify-between overflow-hidden">
         <Logo showText className="text-white [&_span]:text-white [&_.gradient-text]:text-white" />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-4xl font-bold text-white mb-4 leading-tight">
@@ -162,11 +162,11 @@ function LoginForm() {
                             : ClipboardList;
                     const borderClass =
                       demo.key === "pharmacist"
-                        ? "border-teal-500/50 bg-teal-500/10"
+                        ? "border-green-600/50 bg-green-600/10"
                         : demo.key === "admin"
-                          ? "border-violet-500/40 bg-violet-500/10"
+                          ? "border-blue-600/40 bg-blue-600/10"
                           : demo.key === "donor"
-                            ? "border-sky-500/40 bg-sky-500/10"
+                            ? "border-blue-600/40 bg-blue-600/10"
                             : "border-amber-500/40 bg-amber-500/10";
                     return (
                       <button
@@ -216,11 +216,11 @@ function LoginForm() {
                       onClick={() => setRegisterRole("donor")}
                       className={`rounded-xl border-2 p-3 text-left text-sm transition-colors ${
                         registerRole === "donor"
-                          ? "border-sky-500 bg-sky-500/10 font-semibold"
+                          ? "border-blue-600 bg-blue-600/10 font-semibold"
                           : "border-border"
                       }`}
                     >
-                      <Upload className="h-4 w-4 mb-1 text-sky-500" />
+                      <Upload className="h-4 w-4 mb-1 text-blue-600" />
                       Donor
                     </button>
                     <button
@@ -314,7 +314,7 @@ export default function LoginPage() {
       <Suspense
         fallback={
           <div className="min-h-screen flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-sky-500" />
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           </div>
         }
       >

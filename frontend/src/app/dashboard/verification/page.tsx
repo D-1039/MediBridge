@@ -44,7 +44,7 @@ export default function VerificationPage() {
   if (loading) {
     return (
       <div className="flex justify-center py-24">
-        <Loader2 className="h-8 w-8 animate-spin text-sky-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -64,7 +64,7 @@ export default function VerificationPage() {
         subtitle="Review donor uploads: check OCR, safety score, then Approve (verified) or Reject"
       />
 
-      <div className="mb-6 rounded-xl border border-teal-500/30 bg-teal-500/10 px-4 py-3 text-sm text-teal-900 dark:text-teal-100">
+      <div className="mb-6 rounded-xl border border-green-600/30 bg-green-600/10 px-4 py-3 text-sm text-green-900 dark:text-green-100">
         <strong>How to use:</strong> Open each medicine card → verify photo &amp; OCR
         fields → optional notes → click <strong>Approve</strong> (safe to redistribute)
         or <strong>Reject</strong>. Donors must upload first from Upload Medicine page.
@@ -84,7 +84,7 @@ export default function VerificationPage() {
             title="Approved Medicines"
             value={stats.approved_medicines}
             icon={CheckCircle2}
-            gradient="from-emerald-500 to-green-600"
+            gradient="from-green-600 to-green-700"
             delay={0.05}
           />
           <StatCard
@@ -98,7 +98,7 @@ export default function VerificationPage() {
             title="Today's Reviews"
             value={stats.todays_reviews}
             icon={ShieldCheck}
-            gradient="from-sky-500 to-teal-600"
+            gradient="from-blue-600 to-green-600"
             delay={0.15}
           />
         </div>

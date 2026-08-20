@@ -12,8 +12,8 @@ export function getRiskLevel(score: number): {
   if (score >= 80) {
     return {
       label: "Low Risk",
-      color: "text-emerald-600 dark:text-emerald-400",
-      ring: "stroke-emerald-500",
+      color: "text-green-600 dark:text-green-400",
+      ring: "stroke-green-600",
     };
   }
   if (score >= 55) {
@@ -89,7 +89,7 @@ export function SafetyScoreRing({
           Risk Level: {risk.label}
         </p>
         {verified && (
-          <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+          <p className="text-xs text-green-600 dark:text-green-400 mt-1">
             Pharmacist verified — score boosted
           </p>
         )}

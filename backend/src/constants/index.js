@@ -15,10 +15,15 @@ const MEDICINE_STATUS = Object.freeze({
 });
 
 const REQUEST_STATUS = Object.freeze({
-  PENDING: "pending",
-  APPROVED: "approved",
+  SUBMITTED: "submitted",
+  UNDER_REVIEW: "under_review",
+  ASSIGNED: "assigned",
+  READY_FOR_COLLECTION: "ready_for_collection",
   COMPLETED: "completed",
   REJECTED: "rejected",
+  // Legacy values (mapped in DB migration)
+  PENDING: "submitted",
+  APPROVED: "assigned",
 });
 
 const AUDIT_ACTIONS = Object.freeze({

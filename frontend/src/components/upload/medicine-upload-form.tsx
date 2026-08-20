@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Upload, ScanLine, Loader2, ImageIcon } from "lucide-react";
+import { ScanLine, Loader2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OcrSuggestionsCard } from "@/components/upload/OcrSuggestionsCard";
 import { MedicineForm } from "@/components/upload/MedicineForm";
-import { cn } from "@/lib/utils";
+import {
+  ImageGalleryUpload,
+  type GalleryImage,
+} from "@/components/upload/image-gallery-upload";
 import { api, ApiError } from "@/lib/api-client";
 import type { OcrSuggestResponse } from "@/types/api";
 import type { MedicineFormValues, OcrSuggestions } from "@/types/ocr";
@@ -17,9 +19,7 @@ import { hasAnySuggestion, mapSuggestionsToForm } from "@/lib/ocr-utils";
 import { VisionSetupBanner } from "@/components/upload/VisionSetupBanner";
 
 export function MedicineUploadForm() {
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
+  const [images, setImages] = useState<GalleryImage[]>([]);
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -36,33 +36,6 @@ export function MedicineUploadForm() {
     setSuggestionFilled({});
   }, []);
 
-  const handleFile = useCallback(
-    (file: File) => {
-      if (!file.type.startsWith("image/")) {
-        toast.error("Please upload an image file");
-        return;
-      }
-      setImageFile(file);
-      resetSuggestions();
-      setSubmitted(false);
-      setForm(emptyMedicineForm);
-      const reader = new FileReader();
-      reader.onload = (e) => setPreview(e.target?.result as string);
-      reader.readAsDataURL(file);
-    },
-    [resetSuggestions]
-  );
-
-  const onDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      setIsDragging(false);
-      const file = e.dataTransfer.files[0];
-      if (file) handleFile(file);
-    },
-    [handleFile]
-  );
-
   const buildApiFields = () => ({
     medicine_name: form.name,
     quantity: form.quantity || "1",
@@ -73,19 +46,26 @@ export function MedicineUploadForm() {
   });
 
   const handleGetSuggestions = async () => {
-    if (!imageFile) {
-      toast.error("Please upload a medicine image first");
+    if (!images.length) {
+      toast.error("Please upload at least one medicine image first");
       return;
     }
     setIsSuggesting(true);
     resetSuggestions();
     try {
-      const result = await api.getOcrSuggestions(imageFile);
+      const files = images.map((img) => img.file);
+      const result =
+        files.length > 1
+          ? await api.getOcrSuggestionsMulti(files)
+          : await api.getOcrSuggestions(files[0]);
       setSuggestMeta(result);
       if (result.suggestions && hasAnySuggestion(result)) {
         setSuggestions(result.suggestions);
         toast.info("OCR suggestions ready", {
-          description: "Optional — verify on the strip before accepting.",
+          description:
+            files.length > 1
+              ? `Merged from ${files.length} images — verify manually.`
+              : "Optional — verify on the strip before accepting.",
         });
       } else {
         toast.message("No OCR suggestions", {
@@ -114,8 +94,8 @@ export function MedicineUploadForm() {
   };
 
   const handleSubmit = async () => {
-    if (!imageFile) {
-      toast.error("Please upload a medicine image first");
+    if (!images.length) {
+      toast.error("Please upload at least one medicine image");
       return;
     }
     if (!form.name.trim() || !form.quantity.trim()) {
@@ -133,7 +113,10 @@ export function MedicineUploadForm() {
 
     setIsSubmitting(true);
     try {
-      await api.uploadMedicine(imageFile, buildApiFields());
+      await api.uploadMedicine(
+        images.map((img) => img.file),
+        buildApiFields()
+      );
       setSubmitted(true);
       toast.success("Donation submitted!", {
         description: "Awaiting pharmacist verification",
@@ -145,7 +128,7 @@ export function MedicineUploadForm() {
     }
   };
 
-  const hasImage = Boolean(imageFile);
+  const hasImage = images.length > 0;
 
   return (
     <div className="space-y-8">
@@ -155,61 +138,17 @@ export function MedicineUploadForm() {
         <Card className="glass-card border-0 shadow-xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Upload className="h-5 w-5 text-sky-500" />
-              Upload Medicine Image
+              <Upload className="h-5 w-5 text-blue-600" />
+              Upload Medicine Images
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={onDrop}
-              className={cn(
-                "relative border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer",
-                isDragging
-                  ? "border-sky-500 bg-sky-500/5"
-                  : "border-muted-foreground/25 hover:border-sky-500/50 hover:bg-muted/50"
-              )}
-            >
-              <input
-                type="file"
-                accept="image/*"
-                className="absolute inset-0 opacity-0 cursor-pointer"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleFile(file);
-                }}
-              />
-              <AnimatePresence mode="wait">
-                {preview ? (
-                  <motion.div
-                    key="preview"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={preview}
-                      alt="Medicine preview"
-                      className="max-h-72 mx-auto rounded-xl object-contain shadow-lg"
-                    />
-                  </motion.div>
-                ) : (
-                  <motion.div key="placeholder" className="py-10">
-                    <div className="h-16 w-16 rounded-2xl bg-sky-500/10 flex items-center justify-center mx-auto mb-4">
-                      <ImageIcon className="h-8 w-8 text-sky-500" />
-                    </div>
-                    <p className="font-medium mb-1">Drag & drop medicine strip photo</p>
-                    <p className="text-sm text-muted-foreground">
-                      Then enter details manually below
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            <ImageGalleryUpload
+              images={images}
+              onChange={setImages}
+              maxImages={5}
+              disabled={submitted}
+            />
 
             <Button
               className="w-full mt-6"
@@ -223,7 +162,11 @@ export function MedicineUploadForm() {
               ) : (
                 <ScanLine className="h-4 w-4" />
               )}
-              {isSuggesting ? "Reading label…" : "Get OCR Suggestions (Optional)"}
+              {isSuggesting
+                ? "Reading labels…"
+                : images.length > 1
+                  ? "Get OCR Suggestions (All Images)"
+                  : "Get OCR Suggestions (Optional)"}
             </Button>
           </CardContent>
         </Card>
@@ -241,7 +184,8 @@ export function MedicineUploadForm() {
             <Card className="glass-card border-0 border-dashed">
               <CardContent className="py-10 text-center text-sm text-muted-foreground">
                 Enter medicine details on the right, or tap{" "}
-                <strong>Get OCR Suggestions</strong> for optional hints.
+                <strong>Get OCR Suggestions</strong> for optional hints from{" "}
+                {images.length > 1 ? "all uploaded images" : "your image"}.
               </CardContent>
             </Card>
           )}

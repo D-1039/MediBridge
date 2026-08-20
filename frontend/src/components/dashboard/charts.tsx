@@ -30,12 +30,12 @@ export function DonationsChart({ data = chartData }: { data?: ChartPoint[] }) {
           <AreaChart data={data}>
             <defs>
               <linearGradient id="colorDonations" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0} />
+                <stop offset="5%" stopColor="#2563EB" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#2563EB" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="colorDistributed" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
+                <stop offset="5%" stopColor="#16A34A" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#16A34A" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -51,7 +51,7 @@ export function DonationsChart({ data = chartData }: { data?: ChartPoint[] }) {
             <Area
               type="monotone"
               dataKey="donations"
-              stroke="#0ea5e9"
+              stroke="#2563EB"
               fillOpacity={1}
               fill="url(#colorDonations)"
               strokeWidth={2}
@@ -59,7 +59,7 @@ export function DonationsChart({ data = chartData }: { data?: ChartPoint[] }) {
             <Area
               type="monotone"
               dataKey="distributed"
-              stroke="#14b8a6"
+              stroke="#16A34A"
               fillOpacity={1}
               fill="url(#colorDistributed)"
               strokeWidth={2}

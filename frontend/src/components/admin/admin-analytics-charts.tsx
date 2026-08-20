@@ -46,9 +46,9 @@ export function MonthlyDonationChart({ data }: { data: ChartPoint[] }) {
             <Line
               type="monotone"
               dataKey="donations"
-              stroke="#0ea5e9"
+              stroke="#2563EB"
               strokeWidth={2}
-              dot={{ fill: "#0ea5e9" }}
+              dot={{ fill: "#2563EB" }}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -82,14 +82,14 @@ export function VerificationRateChart({ rate }: { rate: number }) {
                 name === "Approved" ? `${value}%` : ""
               }
             >
-              <Cell fill="#10b981" />
+              <Cell fill="#16A34A" />
               <Cell fill="#e2e8f0" />
             </Pie>
             <Tooltip />
             <Legend />
           </PieChart>
         </ResponsiveContainer>
-        <p className="text-center text-2xl font-bold text-emerald-600 mt-2">
+        <p className="text-center text-2xl font-bold text-green-600 mt-2">
           {rate}%
         </p>
       </CardContent>
@@ -123,7 +123,7 @@ export function TopMedicinesBarChart({
               tick={{ fontSize: 10 }}
             />
             <Tooltip />
-            <Bar dataKey={dataKey} fill="#14b8a6" radius={[0, 4, 4, 0]} />
+            <Bar dataKey={dataKey} fill="#16A34A" radius={[0, 4, 4, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

@@ -15,7 +15,7 @@ export const chartData = [
 ];
 
 export const wasteData = [
-  { name: "Reduced", value: 45, fill: "#10b981" },
+  { name: "Reduced", value: 45, fill: "#16A34A" },
   { name: "Remaining", value: 55, fill: "#e2e8f0" },
 ];
 

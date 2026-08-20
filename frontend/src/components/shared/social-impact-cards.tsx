@@ -17,7 +17,7 @@ export function SocialImpactCards({ metrics }: { metrics: ImpactMetrics }) {
         value={metrics.medicines_rescued.toLocaleString()}
         change="Verified & distributed"
         icon={Pill}
-        gradient="from-sky-500 to-blue-600"
+        gradient="from-blue-600 to-blue-700"
         delay={0}
       />
       <StatCard
@@ -33,7 +33,7 @@ export function SocialImpactCards({ metrics }: { metrics: ImpactMetrics }) {
         value={`${metrics.waste_prevented_kg} Kg`}
         change="Diverted from landfill"
         icon={Leaf}
-        gradient="from-emerald-500 to-green-600"
+        gradient="from-green-600 to-green-700"
         delay={0.1}
       />
       <StatCard

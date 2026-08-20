@@ -68,7 +68,7 @@ export function MedicineJourneyTimeline({
                   className={cn(
                     "h-9 w-9 rounded-full flex items-center justify-center border-2",
                     complete
-                      ? "border-emerald-500 bg-emerald-500/15 text-emerald-600"
+                      ? "border-green-600 bg-green-600/15 text-green-600"
                       : "border-muted-foreground/30 bg-muted text-muted-foreground"
                   )}
                 >
@@ -82,7 +82,7 @@ export function MedicineJourneyTimeline({
                   <div
                     className={cn(
                       "w-0.5 flex-1 min-h-[28px] my-1",
-                      complete ? "bg-emerald-500/50" : "bg-border"
+                      complete ? "bg-green-600/50" : "bg-border"
                     )}
                   />
                 )}

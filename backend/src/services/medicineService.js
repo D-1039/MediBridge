@@ -1,10 +1,32 @@
 const medicineRepository = require("../repositories/medicineRepository");
+const medicineImageRepository = require("../repositories/medicineImageRepository");
 const { uploadMedicineImage } = require("./firebaseService");
 const { processOcrForMedicine } = require("./medicineProcessingService");
 const { getOcrSuggestions } = require("./ocrSuggestService");
+const inventorySearchService = require("./inventorySearchService");
 const auditService = require("./auditService");
+const { mergeOcrSuggestions } = require("../utils/mergeOcrResults");
 const { MEDICINE_STATUS, AUDIT_ACTIONS } = require("../constants");
-const { NotFoundError } = require("../utils/errors");
+const { NotFoundError, ValidationError } = require("../utils/errors");
+
+const IMAGE_LABELS = ["front", "back", "expiry", "box", "extra"];
+
+async function attachImages(medicines) {
+  if (!medicines.length) return medicines;
+  const ids = medicines.map((m) => m.id);
+  const images = await medicineImageRepository.findByMedicineIds(ids);
+  const byMedicine = images.reduce((acc, img) => {
+    if (!acc[img.medicine_id]) acc[img.medicine_id] = [];
+    acc[img.medicine_id].push(img);
+    return acc;
+  }, {});
+  return medicines.map((m) => ({
+    ...m,
+    images: byMedicine[m.id] || [
+      { id: m.id, image_url: m.image_url, label: "front", sort_order: 0 },
+    ],
+  }));
+}
 
 const medicineService = {
   /** Optional OCR suggestions — does not write to database. */
@@ -13,7 +35,33 @@ const medicineService = {
     return getOcrSuggestions(dataUrl, file.buffer);
   },
 
-  async uploadAndProcess({ donorId, file, body }) {
+  async suggestFromImages({ files }) {
+    if (!files?.length) {
+      throw new ValidationError("At least one image is required");
+    }
+    const suggestions = [];
+    for (const file of files) {
+      const dataUrl = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+      suggestions.push(await getOcrSuggestions(dataUrl, file.buffer));
+    }
+    const merged = mergeOcrSuggestions(suggestions);
+    return {
+      suggestions: merged,
+      source: "multi-image-merge",
+      disclaimer:
+        "OCR suggestions merged from multiple images. Always verify manually.",
+      images_processed: files.length,
+    };
+  },
+
+  async uploadAndProcess({ donorId, files, body }) {
+    if (!files?.length) {
+      throw new ValidationError("At least one medicine image is required");
+    }
+    if (files.length > 5) {
+      throw new ValidationError("Maximum 5 images allowed");
+    }
+
     const userFields = {
       medicine_name: (body.medicine_name || body.medicineName || "").trim(),
       expiry_date: body.expiry_date || body.expiryDate || null,
@@ -23,8 +71,18 @@ const medicineService = {
       dosage: body.dosage || null,
     };
 
-    const { url } = await uploadMedicineImage(file, donorId);
+    const uploaded = [];
+    for (let i = 0; i < files.length; i += 1) {
+      const { url } = await uploadMedicineImage(files[i], donorId);
+      uploaded.push({
+        url,
+        label: IMAGE_LABELS[i] || `image_${i + 1}`,
+        sort_order: i,
+        buffer: files[i].buffer,
+      });
+    }
 
+    const primary = uploaded[0];
     const medicine = await medicineRepository.create({
       donorId,
       medicineName: userFields.medicine_name,
@@ -32,26 +90,45 @@ const medicineService = {
       batchNumber: userFields.batch_number,
       expiryDate: userFields.expiry_date,
       quantity: userFields.quantity,
-      imageUrl: url,
+      imageUrl: primary.url,
       status: MEDICINE_STATUS.PENDING_OCR,
     });
+
+    await medicineImageRepository.createMany(
+      medicine.id,
+      uploaded.map(({ url, label, sort_order }) => ({ url, label, sort_order }))
+    );
 
     await auditService.log({
       userId: donorId,
       medicineId: medicine.id,
       action: AUDIT_ACTIONS.UPLOAD,
-      description: "Medicine strip image uploaded with donor-entered details",
+      description: `Medicine uploaded with ${uploaded.length} image(s)`,
     });
 
     try {
+      const ocrTexts = [];
+      for (const img of uploaded) {
+        const dataUrl = `data:image/jpeg;base64,${img.buffer.toString("base64")}`;
+        const { extractTextFromImage } = require("./ocrService");
+        try {
+          const { rawText } = await extractTextFromImage(dataUrl, img.buffer);
+          if (rawText) ocrTexts.push(rawText);
+        } catch {
+          /* optional per-image OCR */
+        }
+      }
+
       const result = await processOcrForMedicine(
         medicine.id,
-        url,
+        primary.url,
         donorId,
-        file.buffer,
-        userFields
+        primary.buffer,
+        userFields,
+        ocrTexts.join("\n\n---\n\n") || null
       );
-      return { medicine: result.medicine, validation: result.validation };
+      const withImages = await this.getById(medicine.id);
+      return { medicine: withImages, validation: result.validation };
     } catch (err) {
       await medicineRepository.update(medicine.id, {
         status: MEDICINE_STATUS.MANUAL_REVIEW,
@@ -62,19 +139,34 @@ const medicineService = {
         action: AUDIT_ACTIONS.MANUAL_REVIEW,
         description: `Processing error: ${err.message}`,
       });
-      const updated = await medicineRepository.findById(medicine.id);
+      const updated = await this.getById(medicine.id);
       return { medicine: updated, ocrError: err.message };
     }
   },
 
   async listApproved({ limit, offset }) {
-    return medicineRepository.findApproved({ limit, offset });
+    const medicines = await medicineRepository.findApproved({ limit, offset });
+    return attachImages(medicines);
+  },
+
+  async searchInventory(query, { limit } = {}) {
+    return inventorySearchService.search(query, { limit });
+  },
+
+  async suggestInventory(query, { limit } = {}) {
+    return inventorySearchService.suggest(query, { limit });
   },
 
   async getById(id) {
     const medicine = await medicineRepository.findById(id);
     if (!medicine) throw new NotFoundError("Medicine not found");
-    return medicine;
+    const images = await medicineImageRepository.findByMedicineId(id);
+    return {
+      ...medicine,
+      images: images.length
+        ? images
+        : [{ image_url: medicine.image_url, label: "front", sort_order: 0 }],
+    };
   },
 
   async getApprovedById(id) {
@@ -82,11 +174,16 @@ const medicineService = {
     if (medicine.status !== MEDICINE_STATUS.APPROVED) {
       throw new NotFoundError("Medicine not available");
     }
-    return medicine;
+    const availability = await medicineRepository.getAvailableQuantity(id);
+    return {
+      ...medicine,
+      available_quantity: availability?.available_quantity ?? medicine.quantity,
+    };
   },
 
   async listDonorMedicines(donorId) {
-    return medicineRepository.findByDonor(donorId);
+    const medicines = await medicineRepository.findByDonor(donorId);
+    return attachImages(medicines);
   },
 };
 

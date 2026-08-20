@@ -37,6 +37,11 @@ import {
   TopMedicinesBarChart,
   ExpiryTrendChart,
 } from "@/components/admin/admin-analytics-charts";
+import {
+  RequestVolumeChart,
+  CompletionRateChart,
+  DistributionTrendChart,
+} from "@/components/admin/request-analytics-charts";
 import { formatDate } from "@/utils/format";
 import { Badge } from "@/components/ui/badge";
 
@@ -122,7 +127,7 @@ export default function AdminPanelPage() {
   if (authLoading || loading) {
     return (
       <div className="flex justify-center py-24">
-        <Loader2 className="h-8 w-8 animate-spin text-sky-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -143,13 +148,13 @@ export default function AdminPanelPage() {
           title="Medicines Collected"
           value={analytics.total_medicines_collected}
           icon={Pill}
-          gradient="from-sky-500 to-blue-600"
+          gradient="from-blue-600 to-blue-700"
         />
         <StatCard
           title="Verified Medicines"
           value={analytics.total_verified}
           icon={CheckCircle2}
-          gradient="from-emerald-500 to-green-600"
+          gradient="from-green-600 to-green-700"
         />
         <StatCard
           title="Pending Review"
@@ -170,19 +175,19 @@ export default function AdminPanelPage() {
           title="Patients Helped"
           value={analytics.patients_helped}
           icon={Users}
-          gradient="from-violet-500 to-purple-600"
+          gradient="from-blue-600 to-blue-700"
         />
         <StatCard
           title="Active Requests"
           value={analytics.active_requests}
           icon={ClipboardList}
-          gradient="from-cyan-500 to-teal-600"
+          gradient="from-blue-500 to-green-600"
         />
         <StatCard
           title="Waste Prevented"
           value={`${analytics.waste_prevented_kg} Kg`}
           icon={Leaf}
-          gradient="from-lime-500 to-green-600"
+          gradient="from-green-500 to-green-600"
         />
         <StatCard
           title="Cost Saved"
@@ -272,6 +277,45 @@ export default function AdminPanelPage() {
           </table>
         </div>
       </div>
+
+      {analytics.request_analytics && (
+        <>
+          <h3 className="font-semibold mb-4">Request Analytics</h3>
+          <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+            <StatCard
+              title="Total Requests"
+              value={analytics.request_analytics.total_requests}
+              icon={ClipboardList}
+              gradient="from-blue-600 to-blue-700"
+            />
+            <StatCard
+              title="Pending Requests"
+              value={analytics.request_analytics.pending_requests}
+              icon={Clock}
+              gradient="from-amber-500 to-orange-600"
+            />
+            <StatCard
+              title="Assigned Requests"
+              value={analytics.request_analytics.assigned_requests}
+              icon={CheckCircle2}
+              gradient="from-green-600 to-green-700"
+            />
+            <StatCard
+              title="Completed Requests"
+              value={analytics.request_analytics.completed_requests}
+              icon={Users}
+              gradient="from-blue-600 to-blue-700"
+            />
+          </div>
+          <div className="grid lg:grid-cols-3 gap-6 mb-8">
+            <RequestVolumeChart data={analytics.request_analytics.monthly_volume} />
+            <CompletionRateChart rate={analytics.request_analytics.completion_rate} />
+            <DistributionTrendChart
+              data={analytics.request_analytics.distribution_trend}
+            />
+          </div>
+        </>
+      )}
 
       <div className="grid lg:grid-cols-2 gap-6 mb-8">
         <MonthlyDonationChart data={analytics.monthly_donation_growth} />

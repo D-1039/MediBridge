@@ -57,7 +57,7 @@ export function DashboardSidebar() {
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                 isActive
-                  ? "bg-gradient-to-r from-sky-500/10 to-teal-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20"
+                  ? "bg-gradient-to-r from-blue-600/10 to-green-600/10 text-blue-600 dark:text-blue-400 border border-blue-600/20"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >

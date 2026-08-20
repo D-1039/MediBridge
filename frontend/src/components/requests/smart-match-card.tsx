@@ -17,11 +17,11 @@ export function SmartMatchCard({ match }: { match: SmartMatch }) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mt-4 rounded-xl border border-teal-500/30 bg-gradient-to-br from-teal-500/10 to-sky-500/5 p-4"
+      className="mt-4 rounded-xl border border-green-600/30 bg-gradient-to-br from-green-600/10 to-blue-600/5 p-4"
     >
       <div className="flex items-center gap-2 mb-3">
-        <Sparkles className="h-4 w-4 text-teal-500" />
-        <span className="text-sm font-semibold text-teal-700 dark:text-teal-300">
+        <Sparkles className="h-4 w-4 text-green-600" />
+        <span className="text-sm font-semibold text-green-700 dark:text-green-300">
           Best Match Found
         </span>
         <Badge variant="success" className="ml-auto tabular-nums">
@@ -30,7 +30,7 @@ export function SmartMatchCard({ match }: { match: SmartMatch }) {
       </div>
       <div className="grid sm:grid-cols-2 gap-2 text-sm">
         <div className="flex items-start gap-2">
-          <Package className="h-4 w-4 text-sky-500 mt-0.5 shrink-0" />
+          <Package className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
           <div>
             <p className="text-muted-foreground text-xs">Medicine</p>
             <p className="font-medium">{match.medicine_name}</p>
@@ -41,7 +41,7 @@ export function SmartMatchCard({ match }: { match: SmartMatch }) {
           <p className="font-medium">{match.available_quantity} units</p>
         </div>
         <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4 text-emerald-500" />
+          <MapPin className="h-4 w-4 text-green-600" />
           <div>
             <p className="text-muted-foreground text-xs">Distance</p>
             <p className="font-medium">{match.distance_km} km</p>

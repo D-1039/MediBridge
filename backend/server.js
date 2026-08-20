@@ -26,9 +26,19 @@ async function start() {
     console.log("✓ OCR: Tesseract (Vision not configured)");
   }
 
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`MediBridge API running on port ${PORT}`);
     console.log(`Swagger docs: http://localhost:${PORT}/api/docs`);
+  });
+
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(
+        `Port ${PORT} is already in use. Stop the other backend process or set PORT in backend/.env`
+      );
+      process.exit(1);
+    }
+    throw err;
   });
 }
 

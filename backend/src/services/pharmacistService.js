@@ -1,4 +1,5 @@
 const medicineRepository = require("../repositories/medicineRepository");
+const medicineImageRepository = require("../repositories/medicineImageRepository");
 const auditService = require("./auditService");
 const auditRepository = require("../repositories/auditRepository");
 const { pool } = require("../config/database");
@@ -15,7 +16,20 @@ const pharmacistService = {
   async listPending() {
     const manual = await medicineRepository.findByStatus(MEDICINE_STATUS.MANUAL_REVIEW);
     const pending = await medicineRepository.findByStatus(MEDICINE_STATUS.PENDING_PHARMACIST);
-    return [...manual, ...pending];
+    const combined = [...manual, ...pending];
+    const ids = combined.map((m) => m.id);
+    const images = await medicineImageRepository.findByMedicineIds(ids);
+    const byMedicine = images.reduce((acc, img) => {
+      if (!acc[img.medicine_id]) acc[img.medicine_id] = [];
+      acc[img.medicine_id].push(img);
+      return acc;
+    }, {});
+    return combined.map((m) => ({
+      ...m,
+      images: byMedicine[m.id] || [
+        { image_url: m.image_url, label: "front", sort_order: 0 },
+      ],
+    }));
   },
 
   async getVerificationStats() {
@@ -40,6 +54,7 @@ const pharmacistService = {
   async getMedicineWithAudit(id) {
     const medicine = await this.getMedicine(id);
     const auditTrail = await auditRepository.findByMedicine(id);
+    const images = await medicineImageRepository.findByMedicineId(id);
     const donor = await pool.query(
       `SELECT full_name, email FROM users WHERE id = $1`,
       [medicine.donor_id]
@@ -49,6 +64,9 @@ const pharmacistService = {
         ...medicine,
         donor_name: donor.rows[0]?.full_name,
         donor_email: donor.rows[0]?.email,
+        images: images.length
+          ? images
+          : [{ image_url: medicine.image_url, label: "front", sort_order: 0 }],
       },
       auditTrail,
     };

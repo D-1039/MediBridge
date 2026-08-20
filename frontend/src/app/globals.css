@@ -4,25 +4,25 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 40% 98%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 199 89% 48%;
+    --primary: 217 91% 53%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 166 76% 37%;
+    --secondary: 142 71% 36%;
     --secondary-foreground: 210 40% 98%;
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
-    --accent: 166 76% 96%;
-    --accent-foreground: 166 76% 25%;
-    --destructive: 0 84% 60%;
+    --accent: 214 95% 93%;
+    --accent-foreground: 217 91% 40%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 199 89% 48%;
+    --ring: 217 91% 53%;
     --radius: 0.75rem;
   }
 
@@ -33,9 +33,9 @@
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 199 89% 48%;
+    --primary: 217 91% 60%;
     --primary-foreground: 222 47% 11%;
-    --secondary: 166 76% 37%;
+    --secondary: 142 71% 40%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
@@ -45,7 +45,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 217 33% 17%;
     --input: 217 33% 17%;
-    --ring: 199 89% 48%;
+    --ring: 217 91% 60%;
   }
 }
 
@@ -66,7 +66,7 @@
     @apply glass rounded-2xl;
   }
   .gradient-text {
-    @apply bg-gradient-to-r from-sky-500 via-teal-500 to-emerald-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent;
   }
   .section-padding {
     @apply px-4 sm:px-6 lg:px-8 py-16 md:py-24;

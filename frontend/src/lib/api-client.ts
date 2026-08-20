@@ -15,8 +15,11 @@ import type {
   DashboardAnalytics,
   DonationRequestRecord,
   DonationRequestWithMatch,
+  InventoryMatch,
   MedicineRecord,
   PharmacistStats,
+  ReceiverRequestStats,
+  RequestAnalytics,
   UploadMedicineResult,
   OcrSuggestResponse,
 } from "@/types/api";
@@ -166,6 +169,20 @@ export const api = {
     );
   },
 
+  searchMedicines(query: string, limit = 10) {
+    const q = encodeURIComponent(query);
+    return apiFetch<{ query: string; results: InventoryMatch[] }>(
+      `/api/medicines/search?q=${q}&limit=${limit}`
+    );
+  },
+
+  suggestMedicines(query: string, limit = 5) {
+    const q = encodeURIComponent(query);
+    return apiFetch<{ query: string; suggestions: InventoryMatch[] }>(
+      `/api/medicines/suggest?q=${q}&limit=${limit}`
+    );
+  },
+
   listMyDonations() {
     return apiFetch<MedicineRecord[]>("/api/medicines/donor/my");
   },
@@ -179,9 +196,19 @@ export const api = {
     });
   },
 
-  uploadMedicine(file: File, fields: Record<string, string>) {
+  getOcrSuggestionsMulti(files: File[]) {
     const form = new FormData();
-    form.append("image", file);
+    files.forEach((file) => form.append("images", file));
+    return apiFetch<OcrSuggestResponse>("/api/medicines/ocr-suggest-multi", {
+      method: "POST",
+      body: form,
+    });
+  },
+
+  uploadMedicine(files: File | File[], fields: Record<string, string>) {
+    const form = new FormData();
+    const list = Array.isArray(files) ? files : [files];
+    list.forEach((file) => form.append("images", file));
     Object.entries(fields).forEach(([k, v]) => {
       if (v) form.append(k, v);
     });
@@ -265,15 +292,75 @@ export const api = {
     );
   },
 
+  myRequestStats() {
+    return apiFetch<ReceiverRequestStats>("/api/requests/my/stats");
+  },
+
+  getRequest(id: string) {
+    return apiFetch<DonationRequestRecord>(`/api/requests/${id}`);
+  },
+
+  createRequest(
+    medicineId: string,
+    requestedQuantity: number,
+    searchQuery?: string
+  ) {
+    return apiFetch<DonationRequestRecord>("/api/requests", {
+      method: "POST",
+      body: JSON.stringify({
+        medicine_id: medicineId,
+        requested_quantity: requestedQuantity,
+        search_query: searchQuery,
+      }),
+    });
+  },
+
+  getRequestAnalytics() {
+    return apiFetch<RequestAnalytics>("/api/requests/analytics");
+  },
+
+  reviewRequest(id: string) {
+    return apiFetch<DonationRequestRecord>(`/api/requests/${id}/review`, {
+      method: "PUT",
+    });
+  },
+
+  assignRequest(
+    id: string,
+    assignedMedicineId: string,
+    assignedQuantity?: number
+  ) {
+    return apiFetch<DonationRequestRecord>(`/api/requests/${id}/assign`, {
+      method: "PUT",
+      body: JSON.stringify({
+        assigned_medicine_id: assignedMedicineId,
+        assigned_quantity: assignedQuantity,
+      }),
+    });
+  },
+
+  markRequestReady(id: string) {
+    return apiFetch<DonationRequestRecord>(`/api/requests/${id}/ready`, {
+      method: "PUT",
+    });
+  },
+
   approveRequest(id: string) {
     return apiFetch<DonationRequestRecord>(`/api/requests/${id}/approve`, {
       method: "PUT",
     });
   },
 
-  rejectRequest(id: string) {
+  completeRequest(id: string) {
+    return apiFetch<DonationRequestRecord>(`/api/requests/${id}/complete`, {
+      method: "PUT",
+    });
+  },
+
+  rejectRequest(id: string, notes?: string) {
     return apiFetch<DonationRequestRecord>(`/api/requests/${id}/reject`, {
       method: "PUT",
+      body: JSON.stringify({ notes }),
     });
   },
 };

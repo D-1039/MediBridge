@@ -7,26 +7,32 @@ import { toast } from "sonner";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { RequestCard } from "@/components/requests/request-card";
 import { RequestFilters } from "@/components/requests/request-filters";
+import { ReceiverStats } from "@/components/receiver/receiver-stats";
+import { MedicineSearchPanel } from "@/components/receiver/medicine-search-panel";
+import { AvailableMedicinesPanel } from "@/components/receiver/available-medicines-panel";
+import { PharmacistRequestCard } from "@/components/pharmacist/pharmacist-request-card";
 import { api, ApiError } from "@/lib/api-client";
 import { loadRequestsForRole } from "@/lib/load-requests";
 import { requestToCard } from "@/lib/mappers";
 import { useAuth } from "@/contexts/auth-provider";
 import { Button } from "@/components/ui/button";
+import type { ReceiverRequestStats } from "@/types/api";
+import { normalizeRequestStatus } from "@/lib/request-utils";
 
 type Filter = "all" | "urgent" | "approved" | "pending";
 
 function requestLoadHint(err: unknown, role?: string): string {
   if (err instanceof ApiError) {
     if (err.code === "NETWORK_ERROR" || err.status === 0) {
-      return "Backend chalao: cd backend && npm run dev (port 5000)";
+      return "Start the backend: cd backend && npm run dev (port 5000)";
     }
     if (err.status === 403) {
       return role === "receiver"
-        ? "Receiver account se login karo."
-        : "Is role ke liye requests allowed nahi. Logout karke sahi demo account use karo.";
+        ? "Please sign in with a receiver account."
+        : "This role cannot access requests. Sign out and use the correct demo account.";
     }
     if (err.status === 401) {
-      return "Session expire ho gaya. Dobara login karo.";
+      return "Your session has expired. Please sign in again.";
     }
     return err.message;
   }
@@ -39,7 +45,17 @@ export default function RequestsPage() {
   const [requests, setRequests] = useState<ReturnType<typeof requestToCard>[]>(
     []
   );
+  const [rawRequests, setRawRequests] = useState<
+    Awaited<ReturnType<typeof loadRequestsForRole>>
+  >([]);
+  const [medicineQuery, setMedicineQuery] = useState("");
+  const [receiverStats, setReceiverStats] = useState<ReceiverRequestStats | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
+
+  const isReceiver = user?.role === "receiver";
+  const isPharmacist = user?.role === "pharmacist" || user?.role === "admin";
 
   const canModerate =
     user?.role === "pharmacist" ||
@@ -54,11 +70,18 @@ export default function RequestsPage() {
     setLoading(true);
     try {
       const data = await loadRequestsForRole(user);
+      setRawRequests(data);
       setRequests(data.map(requestToCard));
+
+      if (user.role === "receiver") {
+        const stats = await api.myRequestStats();
+        setReceiverStats(stats);
+      }
     } catch (err) {
       const msg = requestLoadHint(err, user.role);
       toast.error("Failed to load medicine requests", { description: msg });
       setRequests([]);
+      setRawRequests([]);
     } finally {
       setLoading(false);
     }
@@ -73,13 +96,24 @@ export default function RequestsPage() {
   const filtered = useMemo(() => {
     if (filter === "all") return requests;
     if (filter === "urgent") return requests.filter((r) => r.urgency === "urgent");
-    return requests.filter((r) => r.status === filter);
+    if (filter === "approved") {
+      return requests.filter((r) =>
+        ["assigned", "ready_for_collection", "completed", "approved"].includes(
+          normalizeRequestStatus(r.status)
+        )
+      );
+    }
+    return requests.filter((r) =>
+      ["submitted", "under_review", "pending"].includes(
+        normalizeRequestStatus(r.status)
+      )
+    );
   }, [filter, requests]);
 
   if (authLoading || loading) {
     return (
       <div className="flex justify-center py-24">
-        <Loader2 className="h-8 w-8 animate-spin text-sky-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -89,18 +123,31 @@ export default function RequestsPage() {
       <DashboardHeader
         title="Medicine Requests"
         subtitle={
-          user?.role === "receiver"
-            ? "Your medicine requests"
+          isReceiver
+            ? "Search medicines, submit requests, and track status"
             : "Receiver requests for donated medicines"
         }
       />
 
-      {(user?.role === "pharmacist" || user?.role === "admin") && (
-        <div className="mb-6 rounded-xl border border-teal-500/30 bg-teal-500/10 p-4 text-sm">
+      {isReceiver && receiverStats && <ReceiverStats stats={receiverStats} />}
+
+      {isReceiver && (
+        <div className="space-y-8">
+          <AvailableMedicinesPanel onSelectMedicine={setMedicineQuery} />
+          <MedicineSearchPanel
+            onRequestCreated={load}
+            query={medicineQuery}
+            onQueryChange={setMedicineQuery}
+          />
+        </div>
+      )}
+
+      {isPharmacist && (
+        <div className="mb-6 rounded-xl border border-green-600/30 bg-green-600/10 p-4 text-sm">
           <p className="text-muted-foreground">
-            Donor uploads approve/reject karne ke liye{" "}
-            <strong>Approve / Reject</strong> page use karo — yahan sirf receiver
-            ki medicine requests dikhti hain.
+            To approve or reject donor uploads, use the{" "}
+            <strong>Approve / Reject</strong> page. Manage receiver requests
+            here — assign, mark ready, and complete.
           </p>
           <Button asChild size="sm" variant="outline" className="mt-3">
             <Link href="/dashboard/verification">Go to Approve / Reject</Link>
@@ -108,31 +155,66 @@ export default function RequestsPage() {
         </div>
       )}
 
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold mb-1">My Requests</h2>
+        <p className="text-sm text-muted-foreground">
+          {isReceiver
+            ? "Track your submitted requests and assigned medicines"
+            : "All receiver medicine requests"}
+        </p>
+      </div>
+
       <div className="mb-6">
         <RequestFilters active={filter} onChange={setFilter} />
       </div>
-      <div className="grid sm:grid-cols-2 gap-6">
-        {filtered.map((request) => (
-          <RequestCard
-            key={request.id}
-            request={request}
-            showActions={canModerate && request.status === "pending"}
-            onApprove={async (id) => {
-              await api.approveRequest(id);
-              await load();
-            }}
-            onReject={async (id) => {
-              await api.rejectRequest(id);
-              await load();
-            }}
-          />
-        ))}
-      </div>
-      {filtered.length === 0 && (
+
+      {isPharmacist ? (
+        <div className="space-y-6">
+          {rawRequests.map((request) => (
+            <PharmacistRequestCard
+              key={request.id}
+              request={request}
+              onUpdated={load}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="grid sm:grid-cols-2 gap-6">
+          {filtered.map((request) => (
+            <RequestCard
+              key={request.id}
+              request={request}
+              showTimeline={isReceiver}
+              showActions={
+                canModerate &&
+                ["submitted", "under_review", "pending"].includes(
+                  normalizeRequestStatus(request.status)
+                )
+              }
+              onApprove={async (id) => {
+                await api.approveRequest(id);
+                await load();
+              }}
+              onReject={async (id) => {
+                await api.rejectRequest(id);
+                await load();
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {filtered.length === 0 && !isPharmacist && (
         <p className="text-center text-muted-foreground py-12">
-          {user?.role === "receiver"
-            ? "Abhi koi request nahi. Pehle approved medicine choose karke request banao."
-            : "No requests yet. Receiver login se request create hoti hai."}
+          {isReceiver
+            ? "No requests yet. Search above to submit a medicine request."
+            : "No requests yet. Requests are created when a receiver signs in."}
+        </p>
+      )}
+
+      {isPharmacist && rawRequests.length === 0 && (
+        <p className="text-center text-muted-foreground py-12">
+          No receiver requests yet.
         </p>
       )}
     </div>

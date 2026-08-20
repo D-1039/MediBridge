@@ -22,6 +22,7 @@ import { OcrReviewPanel } from "@/components/verification/ocr-review-panel";
 import { SafetyScoreRing } from "@/components/shared/safety-score-ring";
 import { AuthenticityBadges } from "@/components/shared/authenticity-badges";
 import { MedicineJourneyTimeline } from "@/components/shared/medicine-journey-timeline";
+import { MedicineImageGallery } from "@/components/pharmacist/medicine-image-gallery";
 import type { MedicineRecord } from "@/types/api";
 
 export function PharmacistVerificationCard({
@@ -77,16 +78,19 @@ export function PharmacistVerificationCard({
     <motion.div layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <Card className="glass-card border-0 shadow-lg overflow-hidden">
         <div className="grid lg:grid-cols-[220px_1fr]">
-          <div className="bg-gradient-to-br from-sky-500/10 to-teal-500/10 p-6 flex items-center justify-center min-h-[200px]">
-            {medicine.image_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={medicine.image_url}
-                alt={medicine.medicine_name || "Medicine"}
-                className="max-h-48 rounded-xl object-contain shadow-md"
+          <div className="bg-gradient-to-br from-blue-600/10 to-green-600/10 p-4 min-h-[200px]">
+            {medicine.images?.length || medicine.image_url ? (
+              <MedicineImageGallery
+                images={
+                  medicine.images?.length
+                    ? medicine.images
+                    : [{ image_url: medicine.image_url, label: "front" }]
+                }
               />
             ) : (
-              <Package className="h-16 w-16 text-sky-500/50" />
+              <div className="flex items-center justify-center h-full min-h-[180px]">
+                <Package className="h-16 w-16 text-blue-600/50" />
+              </div>
             )}
           </div>
           <CardContent className="p-6 space-y-5">
@@ -126,7 +130,7 @@ export function PharmacistVerificationCard({
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Calendar className="h-4 w-4 text-sky-500 shrink-0" />
+                <Calendar className="h-4 w-4 text-blue-600 shrink-0" />
                 <span>
                   Expiry:{" "}
                   <strong className="text-foreground">
@@ -137,7 +141,7 @@ export function PharmacistVerificationCard({
                 </span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Hash className="h-4 w-4 text-teal-500 shrink-0" />
+                <Hash className="h-4 w-4 text-green-600 shrink-0" />
                 <span>
                   Batch:{" "}
                   <strong className="text-foreground">
@@ -146,7 +150,7 @@ export function PharmacistVerificationCard({
                 </span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <User className="h-4 w-4 text-emerald-500 shrink-0" />
+                <User className="h-4 w-4 text-green-600 shrink-0" />
                 <span>
                   Donor:{" "}
                   <strong className="text-foreground">
@@ -186,7 +190,7 @@ export function PharmacistVerificationCard({
                 />
                 <div className="flex gap-3">
                   <Button
-                    className="flex-1 bg-emerald-500 hover:bg-emerald-600"
+                    className="flex-1 bg-green-600 hover:bg-green-700"
                     disabled={!!loading}
                     onClick={() => handleAction("approved")}
                   >

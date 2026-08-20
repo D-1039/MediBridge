@@ -9,21 +9,21 @@ const problems = [
     title: "Unused Medicines",
     description:
       "Millions of unexpired medicines are discarded annually while patients struggle to afford treatment.",
-    color: "from-sky-500 to-blue-600",
+    color: "from-blue-600 to-blue-700",
   },
   {
     icon: Users,
     title: "Poor Patients",
     description:
       "Low-income families cannot access essential medicines, leading to preventable health complications.",
-    color: "from-teal-500 to-cyan-600",
+    color: "from-green-600 to-blue-600",
   },
   {
     icon: Trash2,
     title: "Healthcare Waste",
     description:
       "Improper disposal of medicines harms the environment and wastes valuable healthcare resources.",
-    color: "from-emerald-500 to-green-600",
+    color: "from-green-600 to-green-700",
   },
 ];
 

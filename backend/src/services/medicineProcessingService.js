@@ -16,7 +16,8 @@ async function processOcrForMedicine(
   imageUrl,
   userId,
   imageBuffer,
-  userFields
+  userFields,
+  preMergedOcrText = null
 ) {
   const warningDays = parseInt(process.env.SAFETY_EXPIRY_WARNING_DAYS || "90", 10);
 
@@ -49,14 +50,25 @@ async function processOcrForMedicine(
 
   let ocrText = null;
   try {
-    const { rawText } = await extractTextFromImage(imageUrl, imageBuffer);
-    ocrText = rawText;
-    await auditService.log({
-      userId,
-      medicineId,
-      action: AUDIT_ACTIONS.OCR_PROCESSED,
-      description: "OCR reference text stored (donor-entered fields used for record)",
-    });
+    if (preMergedOcrText) {
+      ocrText = preMergedOcrText;
+      await auditService.log({
+        userId,
+        medicineId,
+        action: AUDIT_ACTIONS.OCR_PROCESSED,
+        description: "Multi-image OCR reference text stored",
+      });
+    } else {
+      const { rawText } = await extractTextFromImage(imageUrl, imageBuffer);
+      ocrText = rawText;
+      await auditService.log({
+        userId,
+        medicineId,
+        action: AUDIT_ACTIONS.OCR_PROCESSED,
+        description:
+          "OCR reference text stored (donor-entered fields used for record)",
+      });
+    }
   } catch (err) {
     await auditService.log({
       userId,

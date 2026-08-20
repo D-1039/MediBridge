@@ -42,7 +42,7 @@ export function MedicineForm({
     <Card className="glass-card border-0 shadow-xl overflow-visible">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Pencil className="h-5 w-5 text-teal-500" />
+          <Pencil className="h-5 w-5 text-green-600" />
           Medicine Details
         </CardTitle>
         <p className="text-sm text-muted-foreground">
@@ -185,7 +185,7 @@ function FormField({
           {required && <span className="text-red-500 ml-0.5">*</span>}
         </Label>
         {fromSuggestion && (
-          <span className="text-[10px] font-medium uppercase tracking-wide text-sky-600 dark:text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-full">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-blue-600 dark:text-blue-400 bg-blue-600/10 px-2 py-0.5 rounded-full">
             From suggestion
           </span>
         )}

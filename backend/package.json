@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "db:start": "node scripts/embedded-postgres-dev.js",
+    "dev:clean": "powershell -ExecutionPolicy Bypass -File scripts/kill-port.ps1 -Port 5000 && nodemon server.js",
     "migrate": "node src/database/migrate.js",
     "migrate:down": "node src/database/migrate.js down",
     "seed": "node scripts/seed-demo-users.js",
@@ -41,6 +43,7 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "nodemon": "^3.1.9",
+    "pg-embedded": "^0.2.3",
     "supertest": "^7.0.0"
   }
 }

@@ -56,6 +56,49 @@ const medicineRepository = {
     return rows;
   },
 
+  async findAvailableInventory({ limit = 200 } = {}) {
+    const { rows } = await pool.query(
+      `SELECT m.*, u.full_name AS donor_name,
+              GREATEST(
+                m.quantity - COALESCE((
+                  SELECT SUM(dr.requested_quantity)
+                  FROM donation_requests dr
+                  WHERE dr.medicine_id = m.id
+                    AND dr.status NOT IN ('rejected', 'completed')
+                ), 0),
+                0
+              )::int AS available_quantity
+       FROM medicines m
+       JOIN users u ON u.id = m.donor_id
+       WHERE m.status = 'approved'
+         AND (m.expiry_date IS NULL OR m.expiry_date >= CURRENT_DATE)
+         AND m.quantity > 0
+       ORDER BY m.created_at DESC
+       LIMIT $1`,
+      [limit]
+    );
+    return rows.filter((row) => Number(row.available_quantity) > 0);
+  },
+
+  async getAvailableQuantity(medicineId) {
+    const { rows } = await pool.query(
+      `SELECT GREATEST(
+         m.quantity - COALESCE((
+           SELECT SUM(dr.requested_quantity)
+           FROM donation_requests dr
+           WHERE dr.medicine_id = m.id
+             AND dr.status NOT IN ('rejected', 'completed')
+         ), 0),
+         0
+       )::int AS available_quantity,
+       m.status, m.expiry_date
+       FROM medicines m
+       WHERE m.id = $1`,
+      [medicineId]
+    );
+    return rows[0] || null;
+  },
+
   async countApproved() {
     const { rows } = await pool.query(
       `SELECT COUNT(*)::int AS count FROM medicines WHERE status = 'approved'`

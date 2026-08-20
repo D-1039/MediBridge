@@ -9,9 +9,9 @@ export function Hero() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-24">
       <div className="absolute inset-0 bg-gradient-hero" />
-      <div className="absolute top-20 left-10 w-72 h-72 bg-sky-400/20 rounded-full blur-3xl animate-pulse-slow" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-400/20 rounded-full blur-3xl animate-pulse-slow" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-400/10 rounded-full blur-3xl" />
+      <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/15 rounded-full blur-3xl animate-pulse-slow" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-green-500/15 rounded-full blur-3xl animate-pulse-slow" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-green-500/10 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -21,7 +21,7 @@ export function Hero() {
             transition={{ duration: 0.6 }}
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-medium mb-6">
-              <Sparkles className="h-4 w-4 text-sky-500" />
+              <Sparkles className="h-4 w-4 text-blue-600" />
               AI-Powered Healthcare Redistribution
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-6">
@@ -49,8 +49,8 @@ export function Hero() {
                 { icon: Heart, label: "Safe Match" },
               ].map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <div className="h-10 w-10 rounded-xl bg-sky-500/10 flex items-center justify-center">
-                    <Icon className="h-5 w-5 text-sky-500" />
+                  <div className="h-10 w-10 rounded-xl bg-blue-600/10 flex items-center justify-center">
+                    <Icon className="h-5 w-5 text-blue-600" />
                   </div>
                   {label}
                 </div>
@@ -65,10 +65,10 @@ export function Hero() {
             className="relative hidden lg:block"
           >
             <div className="relative w-full aspect-square max-w-lg mx-auto">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-sky-500/20 via-teal-500/20 to-emerald-500/20 animate-float" />
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-600/15 to-green-600/15 animate-float" />
               <div className="absolute inset-8 glass-card p-8 flex flex-col justify-center gap-6">
-                <div className="flex items-center gap-4 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
-                  <div className="h-12 w-12 rounded-xl bg-emerald-500 flex items-center justify-center">
+                <div className="flex items-center gap-4 p-4 rounded-2xl bg-green-600/10 border border-green-600/20">
+                  <div className="h-12 w-12 rounded-xl bg-green-600 flex items-center justify-center">
                     <Pill className="h-6 w-6 text-white" />
                   </div>
                   <div>
@@ -76,8 +76,8 @@ export function Hero() {
                     <p className="text-sm text-muted-foreground">Paracetamol 500mg • Exp: 2027</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 p-4 rounded-2xl bg-sky-500/10 border border-sky-500/20">
-                  <div className="h-12 w-12 rounded-xl bg-sky-500 flex items-center justify-center text-white font-bold">
+                <div className="flex items-center gap-4 p-4 rounded-2xl bg-blue-600/10 border border-blue-600/20">
+                  <div className="h-12 w-12 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold">
                     QR
                   </div>
                   <div>
@@ -85,8 +85,8 @@ export function Hero() {
                     <p className="text-sm text-muted-foreground">Batch #MB-2847</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 p-4 rounded-2xl bg-teal-500/10 border border-teal-500/20">
-                  <div className="h-12 w-12 rounded-xl bg-teal-500 flex items-center justify-center">
+                <div className="flex items-center gap-4 p-4 rounded-2xl bg-green-600/10 border border-green-600/20">
+                  <div className="h-12 w-12 rounded-xl bg-green-600 flex items-center justify-center">
                     <Heart className="h-6 w-6 text-white" />
                   </div>
                   <div>

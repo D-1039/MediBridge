@@ -51,7 +51,7 @@ export function MobileNav() {
               prefetch={true}
               className={cn(
                 "flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-xs transition-colors",
-                isActive ? "text-sky-500" : "text-muted-foreground"
+                isActive ? "text-blue-600" : "text-muted-foreground"
               )}
             >
               <link.icon className="h-5 w-5" />

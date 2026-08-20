@@ -25,7 +25,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/login?portal=pharmacist"
-                  className="hover:text-foreground transition-colors font-medium text-teal-600 dark:text-teal-400"
+                  className="hover:text-foreground transition-colors font-medium text-green-600 dark:text-green-400"
                 >
                   Pharmacist Login (Approve / Reject)
                 </Link>
@@ -51,7 +51,7 @@ export function Footer() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center hover:bg-sky-500/10 hover:text-sky-500 transition-colors"
+                  className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center hover:bg-blue-600/10 hover:text-blue-600 transition-colors"
                 >
                   <Icon className="h-5 w-5" />
                 </a>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Users, Clock, Pill, Check, X, Loader2 } from "lucide-react";
+import { MapPin, Users, Clock, Pill, Check, X, Loader2, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { ApiError } from "@/lib/api-client";
@@ -13,27 +13,41 @@ import {
   SmartMatchCard,
   type SmartMatch,
 } from "@/components/requests/smart-match-card";
+import { RequestTimeline } from "@/components/receiver/request-timeline";
+import { CollectionStatusCard } from "@/components/receiver/collection-status-card";
+import type { RequestStatusHistoryEntry } from "@/types/api";
 
 interface MedicineRequest {
   id: string;
+  requestCode?: string;
   medicine: string;
+  requestedQuantity: number;
+  assignedMedicine?: string | null;
+  assignedQuantity?: number | null;
+  assignedAt?: string | null;
   urgency: "urgent" | "normal";
   requester: string;
   patientInfo: string;
-  status: "pending" | "approved";
+  status: string;
+  statusLabel: string;
+  statusVariant: "warning" | "success" | "secondary" | "urgent" | "default";
   location: string;
   date: string;
+  updatedAt?: string;
+  statusHistory?: RequestStatusHistoryEntry[];
   smart_match?: SmartMatch | null;
 }
 
 export function RequestCard({
   request,
   showActions,
+  showTimeline,
   onApprove,
   onReject,
 }: {
   request: MedicineRequest;
   showActions?: boolean;
+  showTimeline?: boolean;
   onApprove?: (id: string) => Promise<void>;
   onReject?: (id: string) => Promise<void>;
 }) {
@@ -63,10 +77,15 @@ export function RequestCard({
         <CardContent className="p-6">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-sky-500/20 to-teal-500/20 flex items-center justify-center">
-                <Pill className="h-6 w-6 text-sky-500" />
+              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-600/20 to-green-600/20 flex items-center justify-center">
+                <Pill className="h-6 w-6 text-blue-600" />
               </div>
               <div>
+                {request.requestCode && (
+                  <p className="text-xs font-mono text-muted-foreground">
+                    {request.requestCode}
+                  </p>
+                )}
                 <h3 className="font-semibold text-lg">{request.medicine}</h3>
                 <p className="text-sm text-muted-foreground">{request.requester}</p>
               </div>
@@ -75,29 +94,52 @@ export function RequestCard({
               <Badge variant={request.urgency === "urgent" ? "urgent" : "secondary"}>
                 {request.urgency}
               </Badge>
-              <Badge variant={request.status === "approved" ? "success" : "warning"}>
-                {request.status}
-              </Badge>
+              <Badge variant={request.statusVariant}>{request.statusLabel}</Badge>
             </div>
           </div>
 
-          <div className="space-y-2 text-sm text-muted-foreground">
+          <div className="space-y-2 text-sm text-muted-foreground mb-4">
             <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-teal-500" />
+              <Package className="h-4 w-4 text-blue-600" />
+              Requested: {request.requestedQuantity} strip(s)
+            </div>
+            {request.assignedMedicine && (
+              <div className="flex items-center gap-2">
+                <Pill className="h-4 w-4 text-green-600" />
+                Assigned: {request.assignedMedicine} × {request.assignedQuantity}
+                {request.assignedAt && ` · ${formatDate(request.assignedAt)}`}
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-green-600" />
               {request.patientInfo}
             </div>
             <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-sky-500" />
+              <MapPin className="h-4 w-4 text-blue-600" />
               {request.location}
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              {formatDate(request.date)}
+              Requested {formatDate(request.date)}
+              {request.updatedAt && (
+                <span> · Updated {formatDate(request.updatedAt)}</span>
+              )}
             </div>
           </div>
 
-          {request.smart_match && request.status === "pending" && (
+          <CollectionStatusCard status={request.status} />
+
+          {request.smart_match && (
             <SmartMatchCard match={request.smart_match} />
+          )}
+
+          {showTimeline && (
+            <div className="mt-4 pt-4 border-t">
+              <RequestTimeline
+                status={request.status}
+                history={request.statusHistory}
+              />
+            </div>
           )}
 
           {showActions && (

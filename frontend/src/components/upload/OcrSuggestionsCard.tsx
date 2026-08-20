@@ -18,10 +18,10 @@ export function OcrSuggestionsCard({
   onDismiss: () => void;
 }) {
   return (
-    <Card className="glass-card border border-dashed border-sky-500/40 shadow-lg">
+    <Card className="glass-card border border-dashed border-blue-600/40 shadow-lg">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-base">
-          <Sparkles className="h-4 w-4 text-sky-500" />
+          <Sparkles className="h-4 w-4 text-blue-600" />
           Suggested Details (Optional)
         </CardTitle>
         <p className="text-xs text-muted-foreground">

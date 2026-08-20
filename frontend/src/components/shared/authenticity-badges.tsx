@@ -26,7 +26,7 @@ export function AuthenticityBadges({
       {hasOcrReference && (
         <Badge
           variant="secondary"
-          className="gap-1.5 px-2.5 py-1 bg-sky-500/15 text-sky-700 dark:text-sky-300 border-sky-500/30"
+          className="gap-1.5 px-2.5 py-1 bg-blue-600/15 text-blue-700 dark:text-blue-300 border-blue-600/30"
         >
           <ScanLine className="h-3.5 w-3.5" />
           OCR Reference on File

@@ -55,7 +55,7 @@ export function VerificationCard({
     <motion.div layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <Card className="glass-card border-0 shadow-lg overflow-hidden">
         <div className="grid sm:grid-cols-[200px_1fr]">
-          <div className="bg-gradient-to-br from-sky-500/10 to-teal-500/10 p-6 flex items-center justify-center min-h-[180px]">
+          <div className="bg-gradient-to-br from-blue-600/10 to-green-600/10 p-6 flex items-center justify-center min-h-[180px]">
             {medicine.image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -64,7 +64,7 @@ export function VerificationCard({
                 className="max-h-40 rounded-xl object-contain"
               />
             ) : (
-              <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center shadow-lg">
+              <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-blue-600 to-green-600 flex items-center justify-center shadow-lg">
                 <Package className="h-12 w-12 text-white" />
               </div>
             )}
@@ -90,24 +90,24 @@ export function VerificationCard({
 
             <div className="grid sm:grid-cols-2 gap-3 mb-4 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Calendar className="h-4 w-4 text-sky-500" />
+                <Calendar className="h-4 w-4 text-blue-600" />
                 Expiry:{" "}
                 <span className="text-foreground font-medium">
                   {formatDate(medicine.expiryDate)}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Package className="h-4 w-4 text-teal-500" />
+                <Package className="h-4 w-4 text-green-600" />
                 Qty:{" "}
                 <span className="text-foreground font-medium">{medicine.quantity}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <User className="h-4 w-4 text-emerald-500" />
+                <User className="h-4 w-4 text-green-600" />
                 Donor:{" "}
                 <span className="text-foreground font-medium">{medicine.donor}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <ScanLine className="h-4 w-4 text-sky-500" />
+                <ScanLine className="h-4 w-4 text-blue-600" />
                 OCR:{" "}
                 <span className="text-foreground font-medium">
                   {medicine.ocrConfidence}%
@@ -118,7 +118,7 @@ export function VerificationCard({
             {status === "pending" && (
               <div className="flex gap-3">
                 <Button
-                  className="flex-1 bg-emerald-500 hover:bg-emerald-600"
+                  className="flex-1 bg-green-600 hover:bg-green-700"
                   disabled={!!loading}
                   onClick={() => handleAction("approved")}
                 >

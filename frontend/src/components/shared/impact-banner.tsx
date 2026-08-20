@@ -50,9 +50,9 @@ export function ImpactBanner({ metrics }: { metrics: ImpactMetrics }) {
     <motion.section
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card rounded-2xl border border-sky-500/20 bg-gradient-to-br from-sky-500/10 via-teal-500/5 to-emerald-500/10 p-6 sm:p-8 mb-8"
+      className="glass-card rounded-2xl border border-blue-600/20 bg-gradient-to-br from-blue-600/10 to-green-600/10 p-6 sm:p-8 mb-8"
     >
-      <p className="text-xs font-semibold uppercase tracking-widest text-sky-600 dark:text-sky-400 mb-1">
+      <p className="text-xs font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-1">
         Social impact
       </p>
       <h2 className="text-xl sm:text-2xl font-bold mb-6">
@@ -67,7 +67,7 @@ export function ImpactBanner({ metrics }: { metrics: ImpactMetrics }) {
             transition={{ delay: i * 0.08 }}
             className="text-center sm:text-left"
           >
-            <item.icon className="h-6 w-6 text-teal-500 mx-auto sm:mx-0 mb-2" />
+            <item.icon className="h-6 w-6 text-green-600 mx-auto sm:mx-0 mb-2" />
             <p className="text-2xl sm:text-3xl font-bold tabular-nums">
               {item.display ? (
                 item.display

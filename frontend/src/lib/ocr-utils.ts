@@ -26,10 +26,16 @@ export function formatDisplayDate(iso: string | null | undefined): string {
   });
 }
 
-export function hasAnySuggestion(data: OcrSuggestResponse): boolean {
+export function hasAnySuggestion(
+  data: OcrSuggestResponse | { suggestions: OcrSuggestResponse["suggestions"] }
+): boolean {
   const s = data.suggestions;
   if (!s) return false;
   return Boolean(
-    s.medicine_name || s.expiry_date || s.manufacturing_date || s.batch_number
+    s.medicine_name ||
+      s.expiry_date ||
+      s.manufacturing_date ||
+      s.batch_number ||
+      s.quantity
   );
 }

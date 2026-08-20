@@ -22,6 +22,14 @@ export interface ApiResponse<T> {
   errors?: { msg: string; path: string }[];
 }
 
+export interface MedicineImageRecord {
+  id?: string;
+  medicine_id?: string;
+  image_url: string;
+  label?: string | null;
+  sort_order?: number;
+}
+
 export interface MedicineRecord {
   id: string;
   donor_id: string;
@@ -32,6 +40,8 @@ export interface MedicineRecord {
   manufacturing_date?: string | null;
   quantity: number;
   image_url: string;
+  images?: MedicineImageRecord[];
+  available_quantity?: number;
   ocr_text?: string | null;
   ocr_confidence?: number | null;
   safety_score?: number | null;
@@ -39,6 +49,19 @@ export interface MedicineRecord {
   created_at: string;
   donor_name?: string;
   donor_email?: string;
+}
+
+export interface InventoryMatch {
+  medicine_id: string;
+  medicine_name: string | null;
+  dosage?: string | null;
+  batch_number?: string | null;
+  expiry_date?: string | null;
+  available_quantity: number;
+  verification_status: string;
+  match_score: number;
+  image_url?: string;
+  donor_name?: string;
 }
 
 export interface OcrSuggestResponse {
@@ -52,6 +75,7 @@ export interface OcrSuggestResponse {
   disclaimer?: string;
   error?: string;
   source?: string;
+  images_processed?: number;
 }
 
 export interface DashboardAnalytics {
@@ -89,11 +113,31 @@ export interface AdminOverview {
   by_status: Record<string, number>;
 }
 
+export interface RequestAnalytics {
+  total_requests: number;
+  pending_requests: number;
+  assigned_requests: number;
+  completed_requests: number;
+  rejected_requests?: number;
+  by_status: Record<string, number>;
+  monthly_volume: { month: string; count: number }[];
+  completion_rate: number;
+  distribution_trend: { month: string; count: number }[];
+}
+
 export interface AdminAnalytics extends AdminOverview {
   monthly_donation_growth: { month: string; count: number }[];
   most_donated: { name: string; donations: number; units?: number }[];
   most_requested: { name: string; requests: number }[];
   expiry_trend: { month: string; count: number }[];
+  request_analytics?: RequestAnalytics;
+}
+
+export interface ReceiverRequestStats {
+  total_requests: number;
+  pending_requests: number;
+  approved_requests: number;
+  completed_requests: number;
 }
 
 export interface PharmacistStats {
@@ -111,15 +155,32 @@ export interface SmartMatch {
   match_score: number;
 }
 
+export interface RequestStatusHistoryEntry {
+  id: string;
+  status: string;
+  notes?: string | null;
+  created_at: string;
+  changed_by_name?: string;
+}
+
 export interface DonationRequestRecord {
   id: string;
+  request_code?: string;
   medicine_id: string;
   receiver_id: string;
   status: string;
+  requested_quantity?: number;
+  assigned_medicine_id?: string | null;
+  assigned_quantity?: number | null;
+  assigned_at?: string | null;
+  assigned_medicine_name?: string | null;
+  assigned_medicine_status?: string | null;
   created_at: string;
+  updated_at?: string;
   medicine_name?: string;
   receiver_name?: string;
   receiver_email?: string;
+  status_history?: RequestStatusHistoryEntry[];
 }
 
 export interface DonationRequestWithMatch extends DonationRequestRecord {

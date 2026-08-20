@@ -40,9 +40,12 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
         healthcare: {
-          blue: "#0ea5e9",
-          teal: "#14b8a6",
-          green: "#10b981",
+          blue: "#2563EB",
+          green: "#16A34A",
+          warning: "#F59E0B",
+          error: "#DC2626",
+          background: "#F8FAFC",
+          card: "#FFFFFF",
           navy: "#0f172a",
         },
       },
@@ -53,9 +56,9 @@ const config: Config = {
       },
       backgroundImage: {
         "gradient-healthcare":
-          "linear-gradient(135deg, #0ea5e9 0%, #14b8a6 50%, #10b981 100%)",
+          "linear-gradient(135deg, #2563EB 0%, #16A34A 100%)",
         "gradient-hero":
-          "radial-gradient(ellipse at top, rgba(14,165,233,0.15) 0%, transparent 50%), radial-gradient(ellipse at bottom right, rgba(20,184,166,0.1) 0%, transparent 50%)",
+          "radial-gradient(ellipse at top, rgba(37,99,235,0.12) 0%, transparent 50%), radial-gradient(ellipse at bottom right, rgba(22,163,74,0.08) 0%, transparent 50%)",
       },
       animation: {
         "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",

@@ -120,7 +120,7 @@ export default function DashboardPage() {
   if (authLoading || loading) {
     return (
       <div className="flex justify-center py-24">
-        <Loader2 className="h-8 w-8 animate-spin text-sky-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -173,7 +173,7 @@ export default function DashboardPage() {
           value={stats.medicinesSaved.toLocaleString()}
           change={`${stats.medicinesSaved} total donated`}
           icon={Pill}
-          gradient="from-sky-500 to-blue-600"
+          gradient="from-blue-600 to-blue-700"
           delay={0}
         />
         <StatCard
@@ -189,7 +189,7 @@ export default function DashboardPage() {
           value={stats.activeNgos}
           change="Completed distributions"
           icon={Building2}
-          gradient="from-teal-500 to-cyan-600"
+          gradient="from-green-600 to-blue-600"
           delay={0.2}
         />
         <StatCard
@@ -197,7 +197,7 @@ export default function DashboardPage() {
           value={`${stats.wasteReduction}%`}
           change="Approved + distributed"
           icon={TrendingDown}
-          gradient="from-emerald-500 to-green-600"
+          gradient="from-green-600 to-green-700"
           delay={0.3}
         />
       </div>
@@ -224,7 +224,7 @@ export default function DashboardPage() {
           )}
           <WasteReductionChart
             data={[
-              { name: "Reduced", value: stats.wasteReduction, fill: "#10b981" },
+              { name: "Reduced", value: stats.wasteReduction, fill: "#16A34A" },
               {
                 name: "Remaining",
                 value: Math.max(100 - stats.wasteReduction, 0),

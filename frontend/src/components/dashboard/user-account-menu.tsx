@@ -48,12 +48,12 @@ export function UserAccountMenu() {
         onClick={() => setOpen((v) => !v)}
         className={cn(
           "flex items-center gap-2 rounded-xl border border-border bg-card px-2 py-1.5 sm:px-3 shadow-sm transition-colors hover:bg-muted",
-          open && "ring-2 ring-sky-500/30"
+          open && "ring-2 ring-blue-600/30"
         )}
         aria-expanded={open}
         aria-haspopup="menu"
       >
-        <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center text-white font-semibold text-sm shrink-0">
+        <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-blue-600 to-green-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
           {initials}
         </div>
         <div className="hidden sm:block text-left max-w-[140px]">

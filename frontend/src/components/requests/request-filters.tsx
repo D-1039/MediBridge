@@ -26,7 +26,7 @@ export function RequestFilters({ active, onChange }: RequestFiltersProps) {
           className={cn(
             "px-4 py-2 rounded-xl text-sm font-medium transition-all",
             active === filter.value
-              ? "bg-gradient-to-r from-sky-500 to-teal-500 text-white shadow-lg shadow-sky-500/25"
+              ? "bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-lg shadow-blue-600/20"
               : "bg-muted text-muted-foreground hover:bg-muted/80"
           )}
         >
