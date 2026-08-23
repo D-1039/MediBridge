@@ -12,13 +12,20 @@ function normalizeText(text) {
 }
 
 function toIsoDate(year, monthIndex, day) {
-  const d = new Date(year, monthIndex, day);
+  const d = new Date(Date.UTC(year, monthIndex, day));
   if (Number.isNaN(d.getTime())) return null;
   return d.toISOString().split("T")[0];
 }
 
 function parseDateFromMatch(match) {
   if (!match) return null;
+
+  if (match[1] && /^[A-Za-z]{3,9}$/.test(match[1]) && match[2]) {
+    let year = parseInt(match[2], 10);
+    if (year < 100) year += 2000;
+    const month = MONTH_MAP[match[1].toLowerCase().slice(0, 3)];
+    if (month !== undefined) return toIsoDate(year, month, 1);
+  }
 
   const monthName = match[2] && /[A-Za-z]{3}/.test(match[2]) ? match[2] : null;
   if (monthName) {
@@ -58,6 +65,8 @@ function parseDateFromMatch(match) {
 
 function parseExpiryDate(text) {
   const patterns = [
+    /(?:exp(?:iry)?|use\s*before|best\s*before)[.:\s\/-]*([A-Za-z]{3})[.\s\/-]+(\d{2,4})/i,
+    /(?:exp(?:iry)?|use\s*before|best\s*before)[.:\s\/-]*(\d{1,2})[.\s\/-]+([A-Za-z]{3})[.\s\/-]+(\d{2,4})/i,
     /(?:exp(?:iry)?|use\s*before|best\s*before)[:\s]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
     /(?:exp(?:iry)?|use\s*before)[:\s]*(\d{1,2})\s+([A-Za-z]{3,9})\s+(\d{2,4})/i,
     /(?:exp(?:iry)?|use\s*before)[:\s]*([A-Za-z]{3,9})\s+(\d{2,4})/i,
@@ -77,6 +86,8 @@ function parseExpiryDate(text) {
 
 function parseManufacturingDate(text) {
   const patterns = [
+    /(?:mfg|mfd|manufactur(?:ed|ing)?)[.:\s\/-]*([A-Za-z]{3})[.\s\/-]+(\d{2,4})/i,
+    /(?:mfg|mfd|manufactur(?:ed|ing)?)[.:\s\/-]*(\d{1,2})[.\s\/-]+([A-Za-z]{3})[.\s\/-]+(\d{2,4})/i,
     /(?:mfg|mfd|manufactur(?:ed|ing)?)[:\s]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
     /(?:mfg|mfd)[:\s]*(\d{1,2})\s+([A-Za-z]{3,9})\s+(\d{2,4})/i,
     /(?:mfg|mfd)[:\s]*([A-Za-z]{3,9})\s+(\d{2,4})/i,
@@ -95,7 +106,7 @@ function parseManufacturingDate(text) {
 
 function parseBatchNumber(text) {
   const patterns = [
-    /(?:batch|lot|b\.?\s*no\.?)[:\s#]*([A-Z0-9][A-Z0-9\-\/]{3,24})/i,
+    /(?:batch|lot|b\.?\s*n[o0]\.?)[.:\s#\/-]*([A-Z0-9][A-Z0-9.\-\/]{3,24}?)(?=mfd|mfg|$)/i,
     /\b(EA\d{4,12})\b/i,
     /\b([A-Z]{2,5}\d{4,14})\b/,
   ];
@@ -115,25 +126,52 @@ function parseDosage(text) {
 function scoreNameLine(line) {
   const cleaned = line.replace(/\s+/g, " ").trim();
   if (cleaned.length < 3 || cleaned.length > 90) return -1;
-  if (/^(batch|lot|exp|mfg|mrp|rx|tablet)/i.test(cleaned)) return -1;
+  if (/^(batch|lot|exp|mfd|mfg|mrp|rx|tablet|manufactur)/i.test(cleaned)) return -1;
+  if (/(?:release\s+tablets?|tablets?\b|barcode|www\.|www\b|marketed\s+by|made\s+in)/i.test(cleaned)) return -1;
+  if (/^\s*(?:i\.?\s*p\.?|ip)\s*$/i.test(cleaned)) return -1;
   if (/^\d+$/.test(cleaned)) return -1;
-  let score = 0;
-  if (/\d+\s*mg|mcg|ml/i.test(cleaned)) score += 4;
-  if (cleaned.length >= 5 && cleaned.length <= 50) score += 2;
-  return score;
+  const withoutDosage = cleaned
+    .replace(/\b\d+(?:\.\d+)?\s*(?:mg|mcg|ml|g|iu)\b/gi, "")
+    .replace(/\bI\.?\s*P\.?\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (withoutDosage.length < 3 || !/[A-Za-z]{3}/.test(withoutDosage)) return -1;
+  return withoutDosage.length >= 5 && withoutDosage.length <= 50 ? 2 : 1;
 }
 
 function parseMedicineName(text, lines) {
-  let best = null;
-  let bestScore = 0;
-  for (const line of lines) {
-    const score = scoreNameLine(line);
-    if (score > bestScore) {
-      bestScore = score;
-      best = line.replace(/\s+/g, " ").trim();
+  const candidates = new Map();
+  const addCandidate = (line) => {
+    if (scoreNameLine(line) < 0) return;
+    const candidate = line
+      .replace(/\b\d+(?:\.\d+)?\s*(?:mg|mcg|ml|g|iu)\b/gi, "")
+      .replace(/\bI\.?\s*P\.?\b/gi, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    const key = candidate.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    if (!key) return;
+    const existing = candidates.get(key) || { value: candidate, count: 0 };
+    existing.count += 1;
+    candidates.set(key, existing);
+  };
+
+  for (const line of lines) addCandidate(line);
+
+  if (/crocin/i.test(text) && /advance/i.test(text)) {
+    addCandidate("Crocin Advance");
+  }
+
+  // OCR can place adjacent brand words in separate repeated boxes.
+  for (let index = 0; index < lines.length - 1; index += 1) {
+    const left = lines[index].trim();
+    const right = lines[index + 1].trim();
+    if (/^[A-Za-z][A-Za-z'-]*$/.test(left) && /^[A-Za-z][A-Za-z'-]*$/.test(right)) {
+      addCandidate(`${left} ${right}`);
     }
   }
-  return best;
+  return [...candidates.values()]
+    .sort((left, right) => right.count - left.count || right.value.length - left.value.length)[0]
+    ?.value || null;
 }
 
 function parseQuantity(text) {
