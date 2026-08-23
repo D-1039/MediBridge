@@ -11,17 +11,18 @@ async function getOcrSuggestions(imageUrl, imageBuffer = null) {
 
     return {
       suggestions: {
-        medicine_name: parsed.medicine_name || null,
-        expiry_date: parsed.expiry_date || null,
-        manufacturing_date: parsed.manufacturing_date || null,
-        batch_number: parsed.batch_number || null,
+          medicine_name: parsed.medicine_name || null,
+          expiry_date: parsed.expiry_date || null,
+          manufacturing_date: parsed.manufacturing_date || null,
+          batch_number: parsed.batch_number || null,
         quantity: parsed.quantity > 0 ? parsed.quantity : null,
       },
-      source: source || "tesseract",
+      source: source || "paddleocr",
       disclaimer:
         "OCR suggestions are optional and may be incorrect. Always verify the strip manually.",
     };
   } catch (err) {
+    if (err.isOperational) throw err;
     return {
       suggestions: null,
       error: err.message,

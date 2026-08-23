@@ -1,5 +1,15 @@
 services:
   - type: web
+    name: medibridge-ocr
+    env: python
+    rootDir: ../ocr-service
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+
+  - type: web
     name: medibridge-api
     env: node
     region: oregon
@@ -27,4 +37,6 @@ services:
       - key: GOOGLE_APPLICATION_CREDENTIALS
         sync: false
       - key: CORS_ORIGINS
+        sync: false
+      - key: OCR_SERVICE_URL
         sync: false

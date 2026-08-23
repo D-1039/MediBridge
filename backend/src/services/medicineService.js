@@ -108,11 +108,14 @@ const medicineService = {
 
     try {
       const ocrTexts = [];
+      const ocrResults = [];
       for (const img of uploaded) {
         const dataUrl = `data:image/jpeg;base64,${img.buffer.toString("base64")}`;
         const { extractTextFromImage } = require("./ocrService");
         try {
-          const { rawText } = await extractTextFromImage(dataUrl, img.buffer);
+          const ocrResult = await extractTextFromImage(dataUrl, img.buffer);
+          ocrResults.push(ocrResult);
+          const { rawText } = ocrResult;
           if (rawText) ocrTexts.push(rawText);
         } catch {
           /* optional per-image OCR */
@@ -128,7 +131,19 @@ const medicineService = {
         ocrTexts.join("\n\n---\n\n") || null
       );
       const withImages = await this.getById(medicine.id);
-      return { medicine: withImages, validation: result.validation };
+      return {
+        medicine: withImages,
+        validation: result.validation,
+        ocr: {
+          source: ocrResults[0]?.source || "paddleocr",
+          ocrConfidence: ocrResults[0]?.ocrConfidence ?? null,
+          medicalMetadata: ocrResults[0]?.medicalMetadata || {
+            expiry: null,
+            batchNumber: null,
+            dosages: [],
+          },
+        },
+      };
     } catch (err) {
       await medicineRepository.update(medicine.id, {
         status: MEDICINE_STATUS.MANUAL_REVIEW,

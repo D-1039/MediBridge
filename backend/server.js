@@ -18,13 +18,7 @@ async function start() {
 
   const { getOcrHealth } = require("./src/config/ocr");
   const ocr = getOcrHealth();
-  if (ocr.engine === "tesseract" || ocr.mode === "free_local") {
-    console.log("✓ OCR: free local engine (Tesseract) — no Google billing");
-  } else if (ocr.visionAvailable) {
-    console.log("✓ OCR: Google Vision (+ Tesseract fallback if billing blocks)");
-  } else {
-    console.log("✓ OCR: Tesseract (Vision not configured)");
-  }
+  console.log(`OCR: PaddleOCR service at ${ocr.serviceUrl}`);
 
   const server = app.listen(PORT, () => {
     console.log(`MediBridge API running on port ${PORT}`);

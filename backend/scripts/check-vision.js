@@ -18,13 +18,13 @@ async function main() {
     console.log("✓ Vision configured (service account)");
   }
 
-  const { runVisionOcr } = require("../src/services/ocrService");
+  const { extractTextFromImage } = require("../src/services/ocrService");
   const fs = require("fs");
 
   const sample = process.argv[2];
   if (sample && fs.existsSync(sample)) {
     const buf = fs.readFileSync(sample);
-    const result = await runVisionOcr(buf);
+    const result = await extractTextFromImage(null, buf);
     console.log("✓ OCR test OK | source:", result.source);
     console.log("Confidence:", result.ocrConfidence);
     console.log("Text preview:\n", result.rawText.slice(0, 400));
