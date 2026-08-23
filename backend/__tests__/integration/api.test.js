@@ -14,6 +14,25 @@ describe("API integration", () => {
     expect(res.body.success).toBe(true);
   });
 
+  it("returns 401 and stays available for repeated invalid tokens", async () => {
+    const first = await request(app)
+      .post("/api/medicines/ocr-suggest")
+      .set("Authorization", "Bearer invalid-token")
+      .attach("image", Buffer.from("not an image"), "medicine.jpg");
+    const second = await request(app)
+      .post("/api/medicines/ocr-suggest")
+      .set("Authorization", "Bearer expired-token")
+      .attach("image", Buffer.from("not an image"), "medicine.jpg");
+
+    expect(first.status).toBe(401);
+    expect(first.body).toMatchObject({
+      success: false,
+      message: "Invalid or expired token",
+      code: "UNAUTHORIZED",
+    });
+    expect(second.status).toBe(401);
+  });
+
   it("POST /api/auth/register validates input", async () => {
     const res = await request(app)
       .post("/api/auth/register")
