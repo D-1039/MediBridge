@@ -2,8 +2,9 @@ const jwt = require("jsonwebtoken");
 const jwtConfig = require("../config/jwt");
 const userRepository = require("../repositories/userRepository");
 const { UnauthorizedError } = require("../utils/errors");
+const asyncHandler = require("../utils/asyncHandler");
 
-async function authenticate(req, res, next) {
+const authenticate = asyncHandler(async (req, res, next) => {
   const header = req.headers.authorization;
   if (!header?.startsWith("Bearer ")) {
     throw new UnauthorizedError("Access token required");
@@ -20,14 +21,24 @@ async function authenticate(req, res, next) {
     if (err.isOperational) throw err;
     throw new UnauthorizedError("Invalid or expired token");
   }
-}
+});
 
 function authorize(...roles) {
   return (req, res, next) => {
     if (!req.user) throw new UnauthorizedError();
     if (!roles.includes(req.user.role)) {
       const { ForbiddenError } = require("../utils/errors");
-      throw new ForbiddenError("Insufficient permissions");
+      const message = `Insufficient permissions: role '${req.user.role}' is not allowed; required role: ${roles.join(
+        " or "
+      )}`;
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(
+          `[auth] ${req.method} ${req.originalUrl} forbidden for role '${req.user.role}' (required: ${roles.join(
+            ", "
+          )})`
+        );
+      }
+      throw new ForbiddenError(message);
     }
     next();
   };

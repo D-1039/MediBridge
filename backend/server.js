@@ -7,6 +7,15 @@ const { pool } = require("./src/config/database");
 
 const PORT = process.env.PORT || 5000;
 
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled promise rejection:", reason);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught exception:", err);
+  process.exit(1);
+});
+
 async function start() {
   try {
     await pool.query("SELECT 1");
