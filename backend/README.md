@@ -1,154 +1,86 @@
-# MediBridge Backend API
+# MediBridge Backend
 
-Production-ready Node.js/Express API for the MediBridge medicine redistribution platform.
+Node.js 18+ and Express API for MediBridge. The backend owns authentication, PostgreSQL access, medicine intake, OCR coordination, inventory search, pharmacist verification, receiver requests, analytics, and audit logs.
 
-**Frontend is separate** — this package provides integration-ready REST endpoints only.
+## Local Setup
 
-## Architecture
+Create `backend/.env` from `.env.example`. Configure `DATABASE_URL`, JWT secrets, Firebase settings if remote image storage is desired, and `OCR_SERVICE_URL` for the sibling OCR service. With `USE_LOCAL_STORAGE=true`, development can store uploads locally when Firebase is not configured.
 
+Start the sibling OCR service first from `ocr-service/`:
+
+```bash
+uvicorn app:app --host 0.0.0.0 --port 8000
 ```
-Frontend → Express API → Firebase Storage → Google Vision OCR
-         → Medicine Parser → Safety Engine → PostgreSQL → Pharmacist Verification
-         → Marketplace → Receiver Requests → Audit Logs
-```
 
-## Quick Start
+If OCR requests report `OCR service unavailable: fetch failed`, start the Python service separately and verify `http://localhost:8000/health`. The Node startup message only displays the configured URL; it does not start or probe the OCR service. On this local setup, the failure was caused by the OCR service not running; both `localhost:8000` and `127.0.0.1:8000` refused connections.
+
+Then run the API:
 
 ```bash
 cd backend
-cp .env.example .env
-# Fill DATABASE_URL, Firebase, and GCP Vision credentials
 npm install
 npm run migrate
+npm run seed
 npm run dev
 ```
 
-- API: `http://localhost:5000/api`
-- Swagger: `http://localhost:5000/api/docs`
-- Health: `http://localhost:5000/api/health`
+The API listens on port `5000` by default. Local URLs are `http://localhost:5000/api`, `http://localhost:5000/api/health`, and `http://localhost:5000/api/docs`.
 
-## API Endpoints
+## Scripts
 
-| Method | Endpoint | Role | Description |
-|--------|----------|------|-------------|
-| POST | `/api/auth/register` | Public | Register user |
-| POST | `/api/auth/login` | Public | Login + JWT |
-| POST | `/api/auth/refresh` | Public | Refresh access token |
-| POST | `/api/auth/logout` | Public | Revoke refresh token |
-| GET | `/api/auth/me` | Auth | Current user profile |
-| POST | `/api/medicines/upload` | Donor | Upload image → Firebase → OCR |
-| GET | `/api/medicines` | Public | Approved marketplace list |
-| GET | `/api/medicines/:id` | Public | Approved medicine detail |
-| GET | `/api/medicines/donor/my` | Donor | Donor's uploads |
-| GET | `/api/pharmacist/pending` | Pharmacist | Pending verification queue |
-| GET | `/api/pharmacist/medicine/:id` | Pharmacist | Medicine + audit trail |
-| PUT | `/api/pharmacist/approve/:id` | Pharmacist | Approve medicine |
-| PUT | `/api/pharmacist/reject/:id` | Pharmacist | Reject medicine |
-| PUT | `/api/pharmacist/manual-review/:id` | Pharmacist | Send to manual review |
-| POST | `/api/requests` | Receiver | Request approved medicine |
-| GET | `/api/requests/my` | Receiver | My requests |
-| PUT | `/api/requests/:id/approve` | Pharmacist/Donor/Admin | Approve request |
-| PUT | `/api/requests/:id/complete` | Pharmacist/Donor/Admin | Mark distributed |
-| PUT | `/api/requests/:id/reject` | Pharmacist/Admin | Reject request |
-| GET | `/api/analytics/dashboard` | Auth | Platform statistics |
+- `npm start` - start `server.js`.
+- `npm run dev` - start the API with nodemon.
+- `npm run dev:clean` - stop port 5000 with the included PowerShell helper, then start nodemon.
+- `npm run migrate` and `npm run migrate:down` - apply or roll back database migrations.
+- `npm run db:start` - start the embedded PostgreSQL development helper.
+- `npm run seed` - create demo users.
+- `npm run check-ocr [image]` - check OCR configuration or process an image.
+- `npm run check-vision [image]` - legacy-named diagnostic script that now uses the configured OCR boundary.
+- `npm test` and `npm run test:watch` - run Jest.
 
-## Medicine Upload Flow
+## OCR
 
-1. Donor sends `multipart/form-data` with field `image`
-2. Image uploaded to **Firebase Storage** (URL saved in DB only)
-3. **Google Vision OCR** extracts text + confidence
-4. **Parser** extracts name, dosage, batch, expiry, quantity
-5. **Safety engine** validates expiry, batch, OCR confidence
-6. Status set to `pending_pharmacist` or `manual_review`
-7. Pharmacist has **final authority** for approve/reject
+`src/services/ocrClient.js` sends image buffers to `${OCR_SERVICE_URL}/ocr` using native Node 18 `fetch`, `FormData`, and `Blob`. The default URL is `http://localhost:8000`.
 
-## Frontend Integration
+The active OCR source is the sibling PaddleOCR service. Its response includes `rawText`, `ocrConfidence`, `source`, `medicalMetadata`, `words`, `batchNumberConfidence`, and `batchNumberNeedsReview`. Batch numbers can contain dense alphanumeric characters that OCR misreads, so values below the `0.90` threshold are flagged for manual verification. Network failures map to `503`, no detected text passes through as `422`, and other OCR service failures map to `502`.
 
-```javascript
-// Login
-const res = await fetch(`${API_URL}/api/auth/login`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email, password }),
-});
-const { data } = await res.json();
-localStorage.setItem("accessToken", data.accessToken);
+`/api/medicines/ocr-suggest` and `/api/medicines/ocr-suggest-multi` expose OCR values as editable suggestions. Upload persistence uses the fields submitted by the donor; OCR does not silently overwrite expiry, batch number, or dosage.
 
-// Upload medicine
-const form = new FormData();
-form.append("image", file);
-form.append("quantity", "10");
-await fetch(`${API_URL}/api/medicines/upload`, {
-  method: "POST",
-  headers: { Authorization: `Bearer ${accessToken}` },
-  body: form,
-});
-```
+The frontend highlights a flagged batch number in amber, leaves it out when accepting suggestions, and offers a close-up `Retake Photo` action. Medicine Name, manufacturing date, and expiry date are not batch-confidence flagged.
+
+## API Areas
+
+- `/api/auth` - registration, login, refresh, logout, and current-user details.
+- `/api/medicines` - upload, OCR suggestions, donor medicines, inventory search, and approved medicine listing.
+- `/api/pharmacist` - pending queue, medicine details, statistics, approval, rejection, and manual review.
+- `/api/requests` - receiver requests and pharmacist/donor/admin request actions.
+- `/api/admin` - overview, analytics, medicine details, and recent activity.
+- `/api/analytics` - dashboard analytics.
+- `/api/health` - API and OCR configuration health information.
 
 ## Environment Variables
 
-See `.env.example` for the full list.
+The complete local example is in `.env.example`. The main variables are `NODE_ENV`, `PORT`, `API_BASE_URL`, `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `JWT_REFRESH_SECRET`, `JWT_REFRESH_EXPIRES_IN`, `CORS_ORIGINS`, Firebase settings, `OCR_SERVICE_URL`, `USE_LOCAL_STORAGE`, `RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX`, `SAFETY_LOW_OCR_THRESHOLD`, and `SAFETY_EXPIRY_WARNING_DAYS`.
 
-## Deployment
+## Structure
 
-### Render (API)
-
-1. Create Web Service from this `backend/` directory
-2. Set `DATABASE_URL` from Neon
-3. Add Firebase + GCP credentials as env vars
-4. Use `render.yaml` or set start: `npm run migrate && npm start`
-
-### Neon PostgreSQL
-
-1. Create project at [neon.tech](https://neon.tech)
-2. Copy connection string to `DATABASE_URL`
-3. Run `npm run migrate`
-
-### Firebase Storage
-
-1. Enable Storage in Firebase Console
-2. Create service account → download JSON
-3. Set `FIREBASE_*` env vars
-
-### Google Cloud Vision
-
-1. Enable Vision API
-2. Create service account with Vision User role
-3. Set `GOOGLE_APPLICATION_CREDENTIALS` path or inline credentials
-
-## Production Checklist
-
-- [ ] Strong `JWT_SECRET` and `JWT_REFRESH_SECRET`
-- [ ] Neon `DATABASE_URL` with SSL
-- [ ] Firebase bucket rules secured
-- [ ] CORS limited to production frontend URL
-- [ ] Rate limits tuned for traffic
-- [ ] GCP billing alerts enabled
-- [ ] Run migrations on deploy
-- [ ] Health check `/api/health` monitored
-
-## Tests
-
-```bash
-npm test
-```
-
-## Project Structure
-
-```
+```text
 backend/
 ├── src/
-│   ├── config/       # DB, Firebase, Vision, JWT
-│   ├── controllers/  # HTTP handlers
-│   ├── routes/       # Express routers
-│   ├── middleware/   # Auth, validation, errors
-│   ├── services/     # Business logic
-│   ├── repositories/ # PostgreSQL access
-│   ├── validators/   # express-validator rules
-│   ├── utils/        # Parser, safety score, errors
-│   ├── docs/         # Swagger
-│   └── app.js
-├── migrations/       # SQL schema
-├── __tests__/        # Unit + integration tests
-└── server.js
+│   ├── config/          # Database, Firebase, JWT, OCR, and Vision configuration
+│   ├── controllers/     # HTTP handlers
+│   ├── routes/           # Express route modules
+│   ├── middleware/       # Authentication, uploads, validation, and errors
+│   ├── services/         # OCR client, business logic, storage, and audit services
+│   ├── repositories/     # PostgreSQL access
+│   ├── validators/       # Request validation
+│   ├── utils/            # Parsing, safety, response, and error helpers
+│   ├── docs/             # Swagger configuration and paths
+│   └── app.js            # Express application
+├── migrations/           # SQL schema migrations
+├── scripts/              # Development, seed, OCR, and database utilities
+├── __tests__/            # Unit and integration tests
+└── server.js             # Local API entry point
 ```
+
+The backend package dependencies are declared in `package.json`; notably, OCR is not a Node package dependency. The Python dependencies for PaddleOCR are declared in `../ocr-service/requirements.txt`.
