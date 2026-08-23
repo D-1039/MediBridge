@@ -4,20 +4,37 @@ const OCR_SERVICE_URL = (process.env.OCR_SERVICE_URL || "http://localhost:8000")
   /\/$/,
   ""
 );
+const OCR_NETWORK_ATTEMPTS = 3;
+
+function wait(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
 
 async function runPaddleOcr(buffer) {
   if (!buffer?.length) {
     throw new AppError("Image data is empty", 400, "OCR_INVALID_IMAGE");
   }
 
-  const form = new FormData();
-  form.append("image", new Blob([buffer], { type: "image/jpeg" }), "medicine-image.jpg");
-
   let response;
-  try {
-    response = await fetch(`${OCR_SERVICE_URL}/ocr`, { method: "POST", body: form });
-  } catch (err) {
-    throw new AppError(`OCR service unavailable: ${err.message}`, 503, "OCR_UNAVAILABLE");
+  let lastNetworkError;
+  for (let attempt = 1; attempt <= OCR_NETWORK_ATTEMPTS; attempt += 1) {
+    const form = new FormData();
+    form.append("image", new Blob([buffer], { type: "image/jpeg" }), "medicine-image.jpg");
+    try {
+      response = await fetch(`${OCR_SERVICE_URL}/ocr`, { method: "POST", body: form });
+      break;
+    } catch (err) {
+      lastNetworkError = err;
+      if (attempt < OCR_NETWORK_ATTEMPTS) await wait(attempt * 250);
+    }
+  }
+
+  if (!response) {
+    throw new AppError(
+      `OCR service unavailable: ${lastNetworkError?.message || "fetch failed"}`,
+      503,
+      "OCR_UNAVAILABLE"
+    );
   }
 
   let payload = {};
