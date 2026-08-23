@@ -119,6 +119,7 @@ export function ImageGalleryUpload({
         )}
       >
         <input
+          id="medicine-image-picker"
           type="file"
           accept="image/*"
           multiple

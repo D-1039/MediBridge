@@ -83,6 +83,7 @@ export function MedicineUploadForm() {
   const handleAcceptSuggestions = () => {
     if (!suggestions) return;
     const mapped = mapSuggestionsToForm(suggestions);
+    if (suggestMeta?.batchNumberNeedsReview) delete mapped.batchNumber;
     const filled: Partial<Record<keyof MedicineFormValues, boolean>> = {};
     (Object.keys(mapped) as (keyof MedicineFormValues)[]).forEach((key) => {
       if (mapped[key]) filled[key] = true;
@@ -176,6 +177,9 @@ export function MedicineUploadForm() {
             <OcrSuggestionsCard
               suggestions={suggestions}
               disclaimer={suggestMeta?.disclaimer}
+              batchNumberConfidence={suggestMeta?.batchNumberConfidence}
+              batchNumberNeedsReview={suggestMeta?.batchNumberNeedsReview}
+              onRetake={() => document.getElementById("medicine-image-picker")?.click()}
               onAccept={handleAcceptSuggestions}
               onDismiss={resetSuggestions}
             />

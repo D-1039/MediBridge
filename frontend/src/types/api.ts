@@ -72,6 +72,9 @@ export interface OcrSuggestResponse {
     batch_number: string | null;
     quantity: number | null;
   } | null;
+  batchNumberConfidence?: number | null;
+  batchNumberNeedsReview?: boolean;
+  rawText?: string;
   disclaimer?: string;
   error?: string;
   source?: string;
