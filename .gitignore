@@ -1,5 +1,5 @@
 # dependencies
-/node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -13,31 +13,36 @@
 
 # next.js
 /.next/
-/frontend/.next/
+frontend/.next/
 /out/
-/frontend/out/
+frontend/out/
 /frontend/node_modules/
 
 # production
-/build
-/frontend/build
+build/
+frontend/build/
+dist/
 
 # misc
 .DS_Store
 Thumbs.db
 *.pem
+.vscode/
+.idea/
 
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.log
 
 # env files
 .env*.local
 .env
-backend/.env
-frontend/.env
+*.env
+!.env.example
+!**/.env.example
 
 # backend
 backend/node_modules/
@@ -48,6 +53,24 @@ backend/vision-api-key.txt
 backend/uploads/
 backend/.pg-data/
 backend/.pg-data-test/
+
+# Python and OCR service
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+.venv/
+env/
+.paddleocr/
+paddleocr/
+ocr-service/.cache/
+
+# Local databases and Docker overrides
+*.db
+*.sqlite
+*.sqlite3
+docker-compose.override.yml
+docker-compose.*.override.yml
 
 # vercel
 .vercel
