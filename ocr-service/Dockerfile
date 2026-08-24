@@ -18,9 +18,11 @@ WORKDIR /app
 COPY requirements.txt .
 
 # 1. Upgrade pip
-# 2. Install requirements (forcing numpy < 2.0)
-# 3. Ensure opencv-python-headless is cleanly re-installed
+# 2. Force install NumPy 1.26.4 FIRST so pip cannot upgrade it to 2.x
+# 3. Install remaining requirements
+# 4. Repair OpenCV headless bindings
 RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir "numpy==1.26.4" && \
     pip install --no-cache-dir -r requirements.txt && \
     pip install --no-cache-dir --force-reinstall opencv-python-headless==4.10.0.84
 
