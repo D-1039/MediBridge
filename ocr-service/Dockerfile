@@ -1,6 +1,5 @@
 FROM python:3.10-slim
 
-# Install minimal OS dependencies required by OpenCV & Paddle
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
     libgomp1 \
@@ -16,15 +15,12 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-# 1. Install NumPy 1.26.4 explicitly first
-RUN pip install --no-cache-dir "numpy==1.26.4"
-
-# 2. Install requirements using --constraint to forbid NumPy >= 2.0.0 anywhere in the dependency tree
-RUN echo "numpy<2.0.0" > /tmp/constraints.txt && \
-    pip install --no-cache-dir -c /tmp/constraints.txt -r requirements.txt
-
-# 3. Fix OpenCV headless bindings
-RUN pip install --no-cache-dir --force-reinstall opencv-python-headless==4.10.0.84
+# 1. Force NumPy 1.26.4
+# 2. Use --no-build-isolation so build dependencies can't pull NumPy 2.x
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir "numpy==1.26.4" && \
+    pip install --no-cache-dir --no-build-isolation -r requirements.txt && \
+    pip install --no-cache-dir --force-reinstall opencv-python-headless==4.10.0.84
 
 COPY . .
 
