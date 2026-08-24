@@ -36,6 +36,7 @@ export interface MedicineRecord {
   medicine_name: string | null;
   dosage: string | null;
   batch_number: string | null;
+  batch_number_verified?: boolean;
   expiry_date: string | null;
   manufacturing_date?: string | null;
   quantity: number;

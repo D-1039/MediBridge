@@ -14,7 +14,7 @@ function mapInventoryItem(medicine) {
     batch_number: medicine.batch_number,
     expiry_date: medicine.expiry_date,
     available_quantity: Number(medicine.available_quantity ?? medicine.quantity ?? 0),
-    verification_status: "verified",
+    verification_status: medicine.batch_number_verified === false ? "unverified" : "verified",
     image_url: medicine.image_url,
     donor_name: medicine.donor_name,
   };

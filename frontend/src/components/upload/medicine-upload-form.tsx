@@ -29,11 +29,13 @@ export function MedicineUploadForm() {
   const [suggestionFilled, setSuggestionFilled] = useState<
     Partial<Record<keyof MedicineFormValues, boolean>>
   >({});
+  const [batchNumberNeedsReview, setBatchNumberNeedsReview] = useState(false);
 
   const resetSuggestions = useCallback(() => {
     setSuggestions(null);
     setSuggestMeta(null);
     setSuggestionFilled({});
+    setBatchNumberNeedsReview(false);
   }, []);
 
   const buildApiFields = () => ({
@@ -42,6 +44,7 @@ export function MedicineUploadForm() {
     expiry_date: form.expiryDate || "",
     manufacturing_date: form.manufacturingDate || "",
     batch_number: form.batchNumber || "",
+    batch_number_verified: String(!batchNumberNeedsReview),
     dosage: form.category || form.description.slice(0, 100),
   });
 
@@ -83,7 +86,7 @@ export function MedicineUploadForm() {
   const handleAcceptSuggestions = () => {
     if (!suggestions) return;
     const mapped = mapSuggestionsToForm(suggestions);
-    if (suggestMeta?.batchNumberNeedsReview) delete mapped.batchNumber;
+    setBatchNumberNeedsReview(Boolean(suggestMeta?.batchNumberNeedsReview));
     const filled: Partial<Record<keyof MedicineFormValues, boolean>> = {};
     (Object.keys(mapped) as (keyof MedicineFormValues)[]).forEach((key) => {
       if (mapped[key]) filled[key] = true;
@@ -198,11 +201,15 @@ export function MedicineUploadForm() {
 
       <MedicineForm
         values={form}
-        onChange={setForm}
+        onChange={(next) => {
+          if (next.batchNumber !== form.batchNumber) setBatchNumberNeedsReview(false);
+          setForm(next);
+        }}
         suggestionFilled={suggestionFilled}
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         submitted={submitted}
+        batchNumberNeedsReview={batchNumberNeedsReview}
         disabled={!hasImage}
       />
     </div>

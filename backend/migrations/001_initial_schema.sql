@@ -53,6 +53,7 @@ CREATE TABLE medicines (
   medicine_name VARCHAR(255),
   dosage VARCHAR(100),
   batch_number VARCHAR(100),
+  batch_number_verified BOOLEAN NOT NULL DEFAULT TRUE,
   expiry_date DATE,
   quantity INTEGER NOT NULL DEFAULT 1,
   image_url TEXT NOT NULL,

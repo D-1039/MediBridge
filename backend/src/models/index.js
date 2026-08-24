@@ -23,6 +23,7 @@ function mapMedicine(row) {
     medicine_name: row.medicine_name,
     dosage: row.dosage,
     batch_number: row.batch_number,
+    batch_number_verified: row.batch_number_verified !== false,
     expiry_date: row.expiry_date,
     quantity: row.quantity,
     image_url: row.image_url,

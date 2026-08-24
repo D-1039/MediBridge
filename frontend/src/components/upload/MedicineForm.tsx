@@ -24,6 +24,7 @@ interface MedicineFormProps {
   isSubmitting: boolean;
   submitted: boolean;
   disabled?: boolean;
+  batchNumberNeedsReview?: boolean;
 }
 
 export function MedicineForm({
@@ -34,6 +35,7 @@ export function MedicineForm({
   isSubmitting,
   submitted,
   disabled,
+  batchNumberNeedsReview = false,
 }: MedicineFormProps) {
   const set = (key: keyof MedicineFormValues, val: string) =>
     onChange({ ...values, [key]: val });
@@ -112,6 +114,11 @@ export function MedicineForm({
               onChange={(e) => set("batchNumber", e.target.value)}
               disabled={disabled}
             />
+            {batchNumberNeedsReview && (
+              <p className="mt-1 text-xs text-amber-700">
+                This batch number could not be verified by OCR and will be flagged for confirmation.
+              </p>
+            )}
           </FormField>
         </div>
 

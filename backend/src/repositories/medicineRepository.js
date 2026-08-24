@@ -5,8 +5,8 @@ const medicineRepository = {
     const { rows } = await pool.query(
       `INSERT INTO medicines (
         donor_id, medicine_name, dosage, batch_number, expiry_date,
-        quantity, image_url, status
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+        batch_number_verified, quantity, image_url, status
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
       RETURNING *`,
       [
         data.donorId,
@@ -14,6 +14,7 @@ const medicineRepository = {
         data.dosage || null,
         data.batchNumber || null,
         data.expiryDate || null,
+        data.batchNumberVerified !== false,
         data.quantity || 1,
         data.imageUrl,
         data.status || "pending_ocr",

@@ -236,6 +236,7 @@ const requestRepository = {
        FROM medicines m
        JOIN users u ON u.id = m.donor_id
        WHERE m.status = 'approved'
+         AND m.batch_number_verified = TRUE
          AND (m.expiry_date IS NULL OR m.expiry_date >= CURRENT_DATE)
          AND m.medicine_name ILIKE $1
        ORDER BY m.quantity DESC, m.created_at DESC

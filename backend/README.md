@@ -46,7 +46,7 @@ The active OCR source is the sibling PaddleOCR service. Its response includes `r
 
 `/api/medicines/ocr-suggest` and `/api/medicines/ocr-suggest-multi` expose OCR values as editable suggestions. Upload persistence uses the fields submitted by the donor; OCR does not silently overwrite expiry, batch number, or dosage.
 
-The frontend highlights a flagged batch number in amber, leaves it out when accepting suggestions, and offers a close-up `Retake Photo` action. Medicine Name, manufacturing date, and expiry date are not batch-confidence flagged.
+The frontend highlights a flagged batch number in amber and preserves it on submission with `batch_number_verified=false`; it also offers a close-up `Retake Photo` action. Medicine Name, manufacturing date, and expiry date are not batch-confidence flagged.
 
 ## API Areas
 

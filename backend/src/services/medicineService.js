@@ -48,6 +48,13 @@ const medicineService = {
     return {
       suggestions: merged,
       source: "multi-image-merge",
+      batchNumberConfidence: suggestions
+        .map((item) => item.batchNumberConfidence)
+        .filter((confidence) => confidence != null)
+        .reduce((lowest, confidence) => Math.min(lowest, confidence), 1) || null,
+      batchNumberNeedsReview: suggestions.some(
+        (item) => item.batchNumberNeedsReview === true
+      ),
       disclaimer:
         "OCR suggestions merged from multiple images. Always verify manually.",
       images_processed: files.length,
@@ -66,6 +73,7 @@ const medicineService = {
       medicine_name: (body.medicine_name || body.medicineName || "").trim(),
       expiry_date: body.expiry_date || body.expiryDate || null,
       batch_number: body.batch_number || body.batchNumber || null,
+      batch_number_verified: body.batch_number_verified !== "false",
       manufacturing_date: body.manufacturing_date || body.manufacturingDate || null,
       quantity: parseInt(body.quantity, 10) || 1,
       dosage: body.dosage || null,
@@ -88,6 +96,7 @@ const medicineService = {
       medicineName: userFields.medicine_name,
       dosage: userFields.dosage,
       batchNumber: userFields.batch_number,
+      batchNumberVerified: userFields.batch_number_verified,
       expiryDate: userFields.expiry_date,
       quantity: userFields.quantity,
       imageUrl: primary.url,

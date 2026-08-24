@@ -6,7 +6,12 @@ const { parseMedicineFromOcr } = require("../utils/parseMedicine");
  */
 async function getOcrSuggestions(imageUrl, imageBuffer = null) {
   try {
-    const { rawText, source } = await extractTextFromImage(imageUrl, imageBuffer);
+    const {
+      rawText,
+      source,
+      batchNumberConfidence,
+      batchNumberNeedsReview,
+    } = await extractTextFromImage(imageUrl, imageBuffer);
     const parsed = parseMedicineFromOcr(rawText);
 
     return {
@@ -18,6 +23,8 @@ async function getOcrSuggestions(imageUrl, imageBuffer = null) {
         quantity: parsed.quantity > 0 ? parsed.quantity : null,
       },
       source: source || "paddleocr",
+      batchNumberConfidence: batchNumberConfidence ?? null,
+      batchNumberNeedsReview: Boolean(batchNumberNeedsReview),
       disclaimer:
         "OCR suggestions are optional and may be incorrect. Always verify the strip manually.",
     };
