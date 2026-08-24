@@ -1,3 +1,24 @@
+# --- RUNTIME FIX FOR PADDLEOCR + NUMPY 2.X ---
+import numpy as np
+
+if not hasattr(np, "sctypes"):
+    np.sctypes = {
+        "int": [np.int8, np.int16, np.int32, np.int64],
+        "uint": [np.uint8, np.uint16, np.uint32, np.uint64],
+        "float": [np.float16, np.float32, np.float64],
+        "complex": [np.complex64, np.complex128],
+        "bool": [np.bool_],
+    }
+# ---------------------------------------------
+
+# Standard imports continue below
+from fastapi import FastAPI
+from paddleocr import PaddleOCR
+
+app = FastAPI()
+
+# Rest of your application...
+
 import re
 from io import BytesIO
 from typing import Any

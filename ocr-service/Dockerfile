@@ -1,10 +1,12 @@
 FROM python:3.10-slim
 
+# Install OS libraries required by OpenCV & Paddle
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
     libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
+# Optimize thread limits for Render free tier
 ENV PYTHONUNBUFFERED=1 \
     OMP_NUM_THREADS=1 \
     MKL_NUM_THREADS=1 \
@@ -15,11 +17,8 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-# 1. Force NumPy 1.26.4
-# 2. Use --no-build-isolation so build dependencies can't pull NumPy 2.x
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir "numpy==1.26.4" && \
-    pip install --no-cache-dir --no-build-isolation -r requirements.txt && \
+    pip install --no-cache-dir -r requirements.txt && \
     pip install --no-cache-dir --force-reinstall opencv-python-headless==4.10.0.84
 
 COPY . .
