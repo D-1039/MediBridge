@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Prevent memory-heavy multithreading in 512MB RAM container
+# Prevent memory-heavy multithreading for Render's 512MB limit
 ENV PYTHONUNBUFFERED=1 \
     OMP_NUM_THREADS=1 \
     MKL_NUM_THREADS=1 \
@@ -17,11 +17,10 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-# Install dependencies and purge any GUI OpenCV variants pip brings in
+# Install requirements and force reinstall opencv-python-headless to repair cv2 bindings
 RUN pip install --no-cache-dir -r requirements.txt && \
-    pip uninstall -y opencv-python opencv-contrib-python
+    pip install --no-cache-dir --force-reinstall opencv-python-headless==4.10.0.84
 
 COPY . .
 
-# Expose port and launch Uvicorn with a single worker to stay under 512MB
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "10000", "--workers", "1"]
