@@ -17,8 +17,11 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-# Install requirements and force reinstall opencv-python-headless to repair cv2 bindings
-RUN pip install --no-cache-dir -r requirements.txt && \
+# 1. Upgrade pip
+# 2. Install requirements (forcing numpy < 2.0)
+# 3. Ensure opencv-python-headless is cleanly re-installed
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
     pip install --no-cache-dir --force-reinstall opencv-python-headless==4.10.0.84
 
 COPY . .
